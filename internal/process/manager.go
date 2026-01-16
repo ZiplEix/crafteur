@@ -2,7 +2,6 @@ package process
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os/exec"
 )
@@ -12,27 +11,31 @@ type Server struct {
 	Stdin     io.WriteCloser
 	ServerDir string
 	JarName   string
+	Output    chan string
+	IsRunning bool
 }
 
 func NewServer(serverDir, jarName string) *Server {
 	return &Server{
 		ServerDir: serverDir,
 		JarName:   jarName,
+		Output:    make(chan string, 100),
+		IsRunning: false,
 	}
 }
 
 func (s *Server) Start() error {
-	// Command : java -Xmx1024M -Xms1024M -jar server.jar nogui
-	s.Cmd = exec.Command("java", "-Xmx1024M", "-Xms1024M", "-jar", s.JarName, "nogui")
-	s.Cmd.Dir = s.ServerDir // IMPORTANT : We execute the command in the data folder
+	if s.IsRunning {
+		return nil
+	}
 
-	// Connect pipes
+	s.Cmd = exec.Command("java", "-Xmx1024M", "-Xms1024M", "-jar", s.JarName, "nogui")
+	s.Cmd.Dir = s.ServerDir
+
 	stdout, err := s.Cmd.StdoutPipe()
 	if err != nil {
 		return err
 	}
-	
-	// We also capture the Stderr (Java errors)
 	s.Cmd.Stderr = s.Cmd.Stdout
 
 	stdin, err := s.Cmd.StdinPipe()
@@ -41,20 +44,23 @@ func (s *Server) Start() error {
 	}
 	s.Stdin = stdin
 
-	// Start the process
 	if err := s.Cmd.Start(); err != nil {
 		return err
 	}
 
-	fmt.Println("--- MINECRAFT SERVER STARTED ---")
+	s.IsRunning = true
+	s.broadcast("--- MINECRAFT SERVER STARTED ---")
 
-	// Goroutine to read server logs in real time
 	go func() {
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
-			// We display the server logs with a prefix
-			fmt.Printf("[MC] %s\n", scanner.Text())
+			text := scanner.Text()
+			s.broadcast(text)
 		}
+
+		s.IsRunning = false
+		s.broadcast("--- MINECRAFT SERVER STOPPED ---")
+		s.Cmd.Wait()
 	}()
 
 	return nil
@@ -68,4 +74,11 @@ func (s *Server) WriteCommand(cmd string) error {
 
 func (s *Server) Wait() error {
 	return s.Cmd.Wait()
+}
+
+func (s *Server) broadcast(msg string) {
+	select {
+	case s.Output <- msg:
+	default:
+	}
 }

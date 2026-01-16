@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft Manager</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-900 text-white font-mono p-10">
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-green-400">Minecraft Server Manager</h1>
+
+        <div class="flex gap-4 mb-4">
+            <button hx-post="/action/start" hx-swap="none"
+                class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Démarrer</button>
+            <button hx-post="/action/stop" hx-swap="none"
+                class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Arrêter</button>
+        </div>
+
+        <div class="bg-black border border-slate-700 rounded-lg p-4 h-96 overflow-y-auto mb-4 flex flex-col-reverse"
+            id="console-container">
+            <div id="logs">
+            </div>
+        </div>
+
+        <form hx-post="/action/command" hx-target="this" hx-swap="none" class="flex gap-2">
+            <input type="text" name="command"
+                class="flex-1 bg-slate-800 border border-slate-600 rounded px-4 py-2 text-white"
+                placeholder="Tapez une commande (ex: op pseudo)..." required>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Envoyer</button>
+        </form>
+    </div>
+
+    <script>
+        // Gestion simple du WebSocket
+        const socket = new WebSocket("ws://" + window.location.host + "/ws");
+        const logsDiv = document.getElementById("logs");
+
+        socket.onmessage = function (event) {
+            const msg = document.createElement("div");
+            msg.textContent = event.data;
+            msg.className = "text-sm text-slate-300 border-b border-slate-800 py-1";
+            logsDiv.appendChild(msg);
+
+            // Auto-scroll vers le bas (car flex-col-reverse ne marche bien que si on prépend, ici on append pour la logique)
+            const container = document.getElementById("console-container");
+            container.scrollTop = container.scrollHeight;
+        };
+
+        socket.onopen = () => { console.log("Connecté à la console"); };
+        socket.onclose = () => { console.log("Déconnecté"); };
+    </script>
+</body>
+
+</html>
