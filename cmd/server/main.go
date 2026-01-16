@@ -12,10 +12,9 @@ import (
 func main() {
 	dataDir := "./data"
 	jarName := "server.jar"
-	// URL officielle Minecraft 1.21.11
+	// Minecraft 1.21.11 official URL
 	jarUrl := "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar"
 
-	// 1. Initialisation fichiers
 	if err := filesystem.EnsureDir(dataDir); err != nil {
 		log.Fatal(err)
 	}
@@ -26,9 +25,7 @@ func main() {
 	}
 	filesystem.CreateEula(dataDir)
 
-	// 2. Préparation du serveur (mais on ne le lance pas tout de suite !)
 	mcServer := process.NewServer(dataDir, jarName)
 
-	// 3. Lancement du serveur Web (qui contrôlera mcServer)
 	web.StartWebServer(mcServer)
 }
