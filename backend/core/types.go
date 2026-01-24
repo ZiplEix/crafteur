@@ -17,7 +17,7 @@ const (
 )
 
 type ServerConfig struct {
-	ID          int        `json:"id"`
+	ID          string     `json:"id"`
 	Name        string     `json:"name"`
 	Type        ServerType `json:"type"`
 	Port        int        `json:"port"`

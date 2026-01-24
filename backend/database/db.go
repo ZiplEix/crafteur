@@ -23,7 +23,7 @@ func InitDB() {
 
 	query := `
 	CREATE TABLE IF NOT EXISTS servers (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		id TEXT PRIMARY KEY,
 		name TEXT,
 		type TEXT,
 		port INTEGER,

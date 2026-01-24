@@ -11,7 +11,7 @@ import (
 )
 
 type Instance struct {
-	ID       int
+	ID       string
 	RunDir   string
 	JarName  string
 	JavaArgs []string
@@ -24,7 +24,7 @@ type Instance struct {
 	Output chan string
 }
 
-func NewInstance(id int, runDir, jarName string) *Instance {
+func NewInstance(id string, runDir, jarName string) *Instance {
 	return &Instance{
 		ID:       id,
 		RunDir:   runDir,

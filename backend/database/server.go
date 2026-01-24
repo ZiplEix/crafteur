@@ -20,19 +20,15 @@ func GetAllServers() ([]core.ServerConfig, error) {
 	return servers, nil
 }
 
-func CreateServer(s *core.ServerConfig) (int, error) {
-	res, err := DB.Exec(
-		"INSERT INTO servers (name, type, port, ram, java_version) VALUES (?, ?, ?, ?, ?)",
-		s.Name, s.Type, s.Port, s.RAM, s.JavaVersion,
+func CreateServer(s *core.ServerConfig) error {
+	_, err := DB.Exec(
+		"INSERT INTO servers (id, name, type, port, ram, java_version) VALUES (?, ?, ?, ?, ?, ?)",
+		s.ID, s.Name, s.Type, s.Port, s.RAM, s.JavaVersion,
 	)
-	if err != nil {
-		return 0, err
-	}
-	id, _ := res.LastInsertId()
-	return int(id), nil
+	return err
 }
 
-func DeleteServer(id int) error {
+func DeleteServer(id string) error {
 	_, err := DB.Exec("DELETE FROM servers WHERE id = ?", id)
 	return err
 }

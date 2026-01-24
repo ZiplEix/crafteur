@@ -5,17 +5,17 @@ import (
 )
 
 type Manager struct {
-	instances map[int]*Instance
+	instances map[string]*Instance
 	mu        sync.RWMutex
 }
 
 func NewManager() *Manager {
 	return &Manager{
-		instances: make(map[int]*Instance),
+		instances: make(map[string]*Instance),
 	}
 }
 
-func (m *Manager) AddInstance(id int, runDir, jarName string) *Instance {
+func (m *Manager) AddInstance(id string, runDir, jarName string) *Instance {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -24,7 +24,7 @@ func (m *Manager) AddInstance(id int, runDir, jarName string) *Instance {
 	return inst
 }
 
-func (m *Manager) GetInstance(id int) (*Instance, bool) {
+func (m *Manager) GetInstance(id string) (*Instance, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
@@ -32,7 +32,7 @@ func (m *Manager) GetInstance(id int) (*Instance, bool) {
 	return inst, exists
 }
 
-func (m *Manager) RemoveInstance(id int) {
+func (m *Manager) RemoveInstance(id string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 

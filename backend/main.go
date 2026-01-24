@@ -6,8 +6,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ZiplEix/crafteur/controller"
 	"github.com/ZiplEix/crafteur/database"
 	"github.com/ZiplEix/crafteur/minecraft"
+	"github.com/ZiplEix/crafteur/routes"
 	"github.com/ZiplEix/crafteur/services"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -15,10 +17,6 @@ import (
 
 //go:embed public/*
 var embedFrontend embed.FS
-
-func init() {
-	database.InitDB()
-}
 
 func getFileSystem() http.FileSystem {
 	fsys, err := fs.Sub(embedFrontend, "public")
@@ -29,6 +27,8 @@ func getFileSystem() http.FileSystem {
 }
 
 func main() {
+	database.InitDB()
+
 	mcManager := minecraft.NewManager()
 	serverService := services.NewServerService(mcManager)
 
@@ -36,16 +36,16 @@ func main() {
 		log.Fatal("Can't load servers at startup:", err)
 	}
 
+	serverCtrl := controller.NewServerController(serverService)
+
 	e := echo.New()
 
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.RemoveTrailingSlash())
+	e.Use(middleware.CORS())
 
-	api := e.Group("/api")
-	api.GET("/health", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]string{"status": "ok", "message": "Go Backend is running"})
-	})
+	routes.Register(e, serverCtrl)
 
 	assetHandler := http.FileServer(getFileSystem())
 	e.GET("/*", echo.WrapHandler(assetHandler))
