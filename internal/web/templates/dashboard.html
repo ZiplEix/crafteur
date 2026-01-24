@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GSM - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-900 text-white font-mono p-10">
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-blue-400">Mes Serveurs Minecraft</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {{ range . }}
+            <div class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-blue-500 transition">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">{{ .Name }}</h2>
+                    <span class="bg-slate-700 text-xs px-2 py-1 rounded uppercase">{{ .Type }}</span>
+                </div>
+                <div class="text-slate-400 mb-4 text-sm">
+                    Port: <span class="text-white">{{ .Port }}</span>
+                </div>
+                <a href="/server/{{ .ID }}"
+                    class="block text-center bg-blue-600 hover:bg-blue-700 py-2 rounded text-white font-bold">
+                    Gérer
+                </a>
+            </div>
+            {{ end }}
+        </div>
+
+        <div class="mt-8 text-center">
+            <button
+                class="border border-dashed border-slate-600 text-slate-500 hover:text-white hover:border-white px-6 py-3 rounded-lg w-full">
+                + Créer un nouveau serveur (Bientôt)
+            </button>
+        </div>
+    </div>
+</body>
+
+</html>

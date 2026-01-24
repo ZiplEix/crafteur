@@ -1,22 +1,6 @@
-<div class="bg-slate-800 p-6 rounded-lg shadow-lg">
-    <h2 class="text-xl font-bold mb-4 text-yellow-400">Configuration du Serveur</h2>
-
-    <form hx-post="/action/save-settings" hx-target="#save-status">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-2 mb-4">
-            {{ range $key, $value := . }}
-            <div class="flex flex-col">
-                <label class="text-xs text-slate-400 uppercase mb-1">{{ $key }}</label>
-                <input type="text" name="{{ $key }}" value="{{ $value }}"
-                    class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white focus:border-blue-500 outline-none">
-            </div>
-            {{ end }}
-        </div>
-
-        <div class="flex items-center justify-between border-t border-slate-700 pt-4">
-            <div id="save-status" class="text-sm font-bold"></div>
-            <button type="submit" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded font-bold transition">
-                Sauvegarder les changements
-            </button>
-        </div>
-    </form>
-</div>
+<form hx-post="/server/{{ .ID }}/save-settings" hx-target="#save-status">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-2 mb-4">
+        {{ range $key, $value := .Props }}
+        {{ end }}
+    </div>
+</form>

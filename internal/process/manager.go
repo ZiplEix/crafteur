@@ -7,6 +7,8 @@ import (
 )
 
 type Server struct {
+	ID        int
+	Port      int
 	Cmd       *exec.Cmd
 	Stdin     io.WriteCloser
 	ServerDir string

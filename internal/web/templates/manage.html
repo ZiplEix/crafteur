@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion Serveur #{{ .ID }}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-900 text-white font-mono p-10">
+
+    <div class="max-w-5xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <a href="/" class="text-slate-500 hover:text-white text-sm">← Retour au Dashboard</a>
+                <h1 class="text-3xl font-bold text-green-400 mt-1">Serveur #{{ .ID }}</h1>
+            </div>
+            <div class="flex gap-2">
+                <button hx-post="/server/{{ .ID }}/start" hx-swap="none"
+                    class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Start</button>
+                <button hx-post="/server/{{ .ID }}/stop" hx-swap="none"
+                    class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Stop</button>
+            </div>
+        </div>
+
+        <div class="flex gap-4 mb-4 border-b border-slate-700 pb-2">
+            <button onclick="window.location.reload()"
+                class="px-4 py-1 hover:bg-slate-800 rounded text-blue-400">Console</button>
+            <button hx-get="/server/{{ .ID }}/settings" hx-target="#main-view"
+                class="px-4 py-1 hover:bg-slate-800 rounded text-yellow-400">Configuration</button>
+        </div>
+
+        <div id="main-view">
+            <div class="bg-black border border-slate-700 rounded-lg p-4 h-96 overflow-y-auto mb-4 flex flex-col-reverse"
+                id="console-container">
+                <div id="logs"></div>
+            </div>
+            <form hx-post="/server/{{ .ID }}/command" hx-target="this" hx-swap="none" class="flex gap-2">
+                <input type="text" name="command"
+                    class="flex-1 bg-slate-800 border border-slate-600 rounded px-4 py-2 text-white"
+                    placeholder="Commande..." required>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Envoyer</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket spécifique à ce serveur ID
+        // On récupère l'ID depuis Go via le template {{ .ID }}
+        const serverId = "{{ .ID }}";
+        const socket = new WebSocket("ws://" + window.location.host + "/server/" + serverId + "/ws");
+
+        socket.onmessage = function (event) {
+            const logsDiv = document.getElementById("logs");
+            if (logsDiv) {
+                const msg = document.createElement("div");
+                msg.textContent = event.data;
+                msg.className = "text-sm text-slate-300 border-b border-slate-800 py-1";
+                logsDiv.appendChild(msg);
+                const container = document.getElementById("console-container");
+                if (container) container.scrollTop = container.scrollHeight;
+            }
+        };
+    </script>
+</body>
+
+</html>

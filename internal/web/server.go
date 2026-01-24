@@ -2,16 +2,20 @@ package web
 
 import (
 	"embed"
+	"fmt"
 	"html/template"
-	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/ZiplEix/crafteur/internal/database"
 	"github.com/ZiplEix/crafteur/internal/filesystem"
 	"github.com/ZiplEix/crafteur/internal/process"
 	"github.com/gorilla/websocket"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-//go:embed templates/*
+//go:embed templates/*.html
 var templateFS embed.FS
 
 var upgrader = websocket.Upgrader{
@@ -19,104 +23,135 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func StartWebServer(mcServer *process.Server) {
-	// main page
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl, _ := template.ParseFS(templateFS, "templates/index.html")
-		tmpl.Execute(w, nil)
-	})
+func StartWebServer() {
+	e := echo.New()
 
-	// start and stop server
-	http.HandleFunc("/action/start", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			go mcServer.Start()
-		}
-	})
+	// Middleware (Logs, Recover)
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-	http.HandleFunc("/action/stop", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			mcServer.WriteCommand("stop")
-		}
-	})
+	// Configuration des templates
+	templates := template.Must(template.ParseFS(templateFS, "templates/*.html"))
+	e.Renderer = &TemplateRegistry{
+		Templates: templates,
+	}
 
-	// send command to server
-	http.HandleFunc("/action/command", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			cmd := r.FormValue("command")
-			mcServer.WriteCommand(cmd)
-		}
-	})
+	// --- ROUTES ---
 
-	// websocket for logs
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		conn, err := upgrader.Upgrade(w, r, nil)
+	// 1. Dashboard : Liste de tous les serveurs
+	e.GET("/", func(c echo.Context) error {
+		servers, err := database.GetAllServers()
 		if err != nil {
-			log.Println(err)
-			return
+			return err
 		}
-		defer conn.Close()
+		return c.Render(http.StatusOK, "dashboard.html", servers)
+	})
 
-		for msg := range mcServer.Output {
-			err := conn.WriteMessage(websocket.TextMessage, []byte(msg))
+	// 2. Vue Détail d'un serveur (Console)
+	e.GET("/server/:id", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+
+		// On vérifie si le serveur est chargé en mémoire
+		srv := process.GetServer(id)
+		if srv == nil {
+			return c.String(http.StatusNotFound, "Serveur introuvable ou non chargé")
+		}
+
+		// On passe l'objet serveur à la vue
+		return c.Render(http.StatusOK, "manage.html", srv)
+	})
+
+	// 3. Actions (HTMX)
+	e.POST("/server/:id/start", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		srv := process.GetServer(id)
+		if srv != nil {
+			go srv.Start()
+		}
+		return c.NoContent(http.StatusOK)
+	})
+
+	e.POST("/server/:id/stop", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		srv := process.GetServer(id)
+		if srv != nil {
+			srv.WriteCommand("stop")
+		}
+		return c.NoContent(http.StatusOK)
+	})
+
+	e.POST("/server/:id/command", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		cmd := c.FormValue("command")
+		srv := process.GetServer(id)
+		if srv != nil {
+			srv.WriteCommand(cmd)
+		}
+		return c.NoContent(http.StatusOK)
+	})
+
+	// 4. WebSocket (Console Live)
+	e.GET("/server/:id/ws", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		srv := process.GetServer(id)
+		if srv == nil {
+			return echo.ErrNotFound
+		}
+
+		ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+		if err != nil {
+			return err
+		}
+		defer ws.Close()
+
+		// On stream le channel Output du serveur vers le websocket
+		for msg := range srv.Output {
+			err := ws.WriteMessage(websocket.TextMessage, []byte(msg))
 			if err != nil {
 				break
 			}
 		}
+		return nil
 	})
 
-	// settings html block
-	http.HandleFunc("/view/settings", func(w http.ResponseWriter, r *http.Request) {
-		propsPath := "./data/server.properties"
+	// 5. Settings (Vue partielle pour HTMX)
+	e.GET("/server/:id/settings", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		srv := process.GetServer(id)
 
+		propsPath := fmt.Sprintf("%s/server.properties", srv.ServerDir)
 		props, err := filesystem.LoadProperties(propsPath)
 		if err != nil {
-			http.Error(w, "Impossible de lire properties: "+err.Error(), 500)
-			return
+			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
-		tmpl, _ := template.ParseFS(templateFS, "templates/settings.html")
-		tmpl.Execute(w, props)
-	})
-
-	// console html block
-	http.HandleFunc("/view/console", func(w http.ResponseWriter, r *http.Request) {
-		html := `
-		<div class="bg-black border border-slate-700 rounded-lg p-4 h-96 overflow-y-auto mb-4 flex flex-col-reverse" id="console-container">
-            <div id="logs"></div>
-        </div>
-		<form hx-post="/action/command" hx-target="this" hx-swap="none" class="flex gap-2">
-            <input type="text" name="command" class="flex-1 bg-slate-800 border border-slate-600 rounded px-4 py-2 text-white" placeholder="Commande..." required>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Envoyer</button>
-        </form>
-		<script>
-			// Reconnexion rapide du socket si on revient sur la vue
-			if(window.setupSocket) window.setupSocket(); 
-		</script>
-		`
-		w.Write([]byte(html))
-	})
-
-	// save settings
-	http.HandleFunc("/action/save-settings", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			r.ParseForm()
-			newProps := make(map[string]string)
-			for key, values := range r.Form {
-				newProps[key] = values[0]
-			}
-
-			err := filesystem.SaveProperties("./data/server.properties", newProps)
-			if err != nil {
-				w.Write([]byte("<span class='text-red-500'>Erreur sauvegarde!</span>"))
-				return
-			}
-
-			w.Write([]byte("<span class='text-green-400'>Sauvegardé ! Redémarrez le serveur.</span>"))
+		// On passe ID et Props à la vue partielle
+		data := map[string]any{
+			"ID":    id,
+			"Props": props,
 		}
+		return c.Render(http.StatusOK, "settings.html", data)
 	})
 
-	log.Printf("Web server started on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	e.POST("/server/:id/save-settings", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		srv := process.GetServer(id)
+
+		// Parsing du formulaire
+		values, _ := c.FormParams()
+		newProps := make(map[string]string)
+		for k, v := range values {
+			if len(v) > 0 {
+				newProps[k] = v[0]
+			}
+		}
+
+		err := filesystem.SaveProperties(srv.ServerDir+"/server.properties", newProps)
+		if err != nil {
+			return c.HTML(http.StatusOK, "<span class='text-red-500'>Erreur !</span>")
+		}
+		return c.HTML(http.StatusOK, "<span class='text-green-400'>Sauvegardé !</span>")
+	})
+
+	e.Logger.Fatal(e.Start(":8080"))
 }
