@@ -74,8 +74,7 @@
 								>Dashboard</a
 							>
 							<button
-								onclick={handleLogout}
-								class="rounded-md px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+								class="rounded-md px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer"
 								>Déconnexion</button
 							>
 						{:else}
@@ -92,8 +91,7 @@
 				<div class="-mr-2 flex md:hidden">
 					<button
 						onclick={() => (isMenuOpen = !isMenuOpen)}
-						type="button"
-						class="inline-flex items-center justify-center rounded-md bg-slate-800 p-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800"
+						class="inline-flex items-center justify-center rounded-md bg-slate-800 p-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-800 cursor-pointer"
 					>
 						<span class="sr-only">Open main menu</span>
 						{#if !isMenuOpen}
@@ -140,7 +138,7 @@
 						>
 						<button
 							onclick={handleLogout}
-							class="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300"
+							class="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
 							>Déconnexion</button
 						>
 					{:else}

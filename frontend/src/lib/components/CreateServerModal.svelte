@@ -69,7 +69,7 @@
                 <h2 class="text-xl font-bold text-white">Nouveau Serveur</h2>
                 <button
                     onclick={onClose}
-                    class="text-slate-400 hover:text-white transition-colors"
+                    class="text-slate-400 hover:text-white transition-colors cursor-pointer"
                 >
                     <X size={20} />
                 </button>

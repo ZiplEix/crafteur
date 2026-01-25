@@ -187,7 +187,7 @@
                 {#if server.status === "STOPPED"}
                     <button
                         on:click={() => sendAction("start")}
-                        class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+                        class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium cursor-pointer"
                     >
                         <Play size={18} />
                         Démarrer
@@ -195,7 +195,7 @@
                 {:else}
                     <button
                         on:click={() => sendAction("stop")}
-                        class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+                        class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors font-medium cursor-pointer"
                     >
                         <Square size={18} />
                         Arrêter
@@ -206,7 +206,7 @@
                                 sendAction("stop").then(() =>
                                     setTimeout(() => sendAction("start"), 2000),
                                 )}
-                            class="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+                            class="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors font-medium cursor-pointer"
                         >
                             <RotateCw size={18} />
                             Redémarrer
@@ -222,7 +222,7 @@
                 {#each tabs as tab}
                     <button
                         on:click={() => (activeTab = tab.id)}
-                        class="flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap
+                        class="flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer
                         {activeTab === tab.id
                             ? 'border-green-500 text-white'
                             : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'}"
