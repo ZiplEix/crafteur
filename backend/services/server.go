@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/ZiplEix/crafteur/core"
@@ -29,11 +30,17 @@ func (s *ServerService) LoadServersAtStartup() error {
 	fmt.Printf("Chargement de %d serveurs depuis la BDD...\n", len(configs))
 
 	for _, cfg := range configs {
-		runDir := filepath.Join("./data/servers", fmt.Sprintf("server_%d", cfg.ID))
+		runDir := filepath.Join("./data/servers", cfg.ID)
+
+		// Verification dossier existe
+		if _, err := os.Stat(runDir); os.IsNotExist(err) {
+			fmt.Printf(" -> Serveur %s (ID: %s) introuvable sur le disque (path: %s), ignoré.\n", cfg.Name, cfg.ID, runDir)
+			continue
+		}
 
 		inst := s.manager.AddInstance(cfg.ID, runDir, "server.jar")
 
-		fmt.Printf(" -> Serveur chargé : %s (ID: %d)\n", cfg.Name, cfg.ID)
+		fmt.Printf(" -> Serveur chargé : %s (ID: %s)\n", cfg.Name, cfg.ID)
 		_ = inst
 	}
 	return nil
@@ -41,6 +48,27 @@ func (s *ServerService) LoadServersAtStartup() error {
 
 func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port int, ram int) (*core.ServerConfig, error) {
 	newID := uuid.New().String()
+	serverPath := filepath.Join("./data/servers", newID)
+
+	// 1. Setup physique
+	if err := core.EnsureDir(serverPath); err != nil {
+		return nil, fmt.Errorf("création dossier impossible: %w", err)
+	}
+
+	// 2. Download (Hardcoded Vanilla 1.21.4)
+	jarPath := filepath.Join(serverPath, "server.jar")
+	downloadUrl := "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar"
+
+	if err := core.DownloadFile(downloadUrl, jarPath); err != nil {
+		os.RemoveAll(serverPath)
+		return nil, fmt.Errorf("téléchargement échoué: %w", err)
+	}
+
+	// 3. EULA
+	if err := core.CreateEula(serverPath); err != nil {
+		os.RemoveAll(serverPath)
+		return nil, fmt.Errorf("eula creation failed: %w", err)
+	}
 
 	cfg := &core.ServerConfig{
 		ID:          newID,
@@ -51,13 +79,14 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 		JavaVersion: 21,
 	}
 
+	// 4. Persistance
 	if err := database.CreateServer(cfg); err != nil {
+		os.RemoveAll(serverPath)
 		return nil, err
 	}
 
-	runDir := filepath.Join("./data/servers", fmt.Sprintf("server_%d", newID))
-
-	s.manager.AddInstance(newID, runDir, "server.jar")
+	// 5. Runtime
+	s.manager.AddInstance(newID, serverPath, "server.jar")
 
 	return cfg, nil
 }
