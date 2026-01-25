@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { Plus, Server, Play, Square, Settings } from "lucide-svelte";
-    import { servers } from "$lib/stores.js";
+    import { servers } from "$lib/stores";
     import CreateServerModal from "$lib/components/CreateServerModal.svelte";
     import { api } from "$lib/api";
 

@@ -163,3 +163,36 @@ func (s *ServerService) GetServerDetail(id string) (*core.ServerDetailResponse, 
 		Status:      status,
 	}, nil
 }
+
+func (s *ServerService) GetProperties(id string) (map[string]string, error) {
+	inst, exists := s.manager.GetInstance(id)
+	if !exists {
+		return nil, fmt.Errorf("serveur introuvable")
+	}
+
+	propsPath := filepath.Join(inst.RunDir, "server.properties")
+	return minecraft.LoadProperties(propsPath)
+}
+
+func (s *ServerService) UpdateProperties(id string, newProps map[string]string) error {
+	inst, exists := s.manager.GetInstance(id)
+	if !exists {
+		return fmt.Errorf("serveur introuvable")
+	}
+
+	propsPath := filepath.Join(inst.RunDir, "server.properties")
+
+	// 1. Charger l'existant
+	currentProps, err := minecraft.LoadProperties(propsPath)
+	if err != nil {
+		return err
+	}
+
+	// 2. Fusionner (update existing keys or add new ones)
+	for k, v := range newProps {
+		currentProps[k] = v
+	}
+
+	// 3. Sauvegarder
+	return minecraft.SaveProperties(propsPath, currentProps)
+}

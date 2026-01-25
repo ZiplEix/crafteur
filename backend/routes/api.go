@@ -33,6 +33,8 @@ func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *c
 	protected.POST("/servers/:id/command", serverCtrl.Command)
 
 	protected.GET("/servers/:id/ws", serverCtrl.Console)
+	protected.GET("/servers/:id/properties", serverCtrl.GetProperties)
+	protected.POST("/servers/:id/properties", serverCtrl.UpdateProperties)
 
 	// File Routes
 	protected.GET("/servers/:id/files", fileCtrl.ListFiles)

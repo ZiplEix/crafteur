@@ -132,3 +132,28 @@ func (ctrl *ServerController) Console(c echo.Context) error {
 	}
 	return nil
 }
+
+// GET /api/servers/:id/properties
+func (ctrl *ServerController) GetProperties(c echo.Context) error {
+	id := c.Param("id")
+	props, err := ctrl.service.GetProperties(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, props)
+}
+
+// POST /api/servers/:id/properties
+func (ctrl *ServerController) UpdateProperties(c echo.Context) error {
+	id := c.Param("id")
+	var props map[string]string
+	if err := c.Bind(&props); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
+	}
+
+	if err := ctrl.service.UpdateProperties(id, props); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"status": "updated"})
+}

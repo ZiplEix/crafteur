@@ -14,6 +14,7 @@
         Square,
         RotateCw,
     } from "lucide-svelte";
+    import { configGroups } from "$lib/config_schema";
     import FileManager from "$lib/components/FileManager.svelte";
 
     interface ServerDetail {
@@ -31,6 +32,7 @@
     let activeTab: string = "console";
     let logs: string[] = [];
     let commandInput: string = "";
+    let properties: Record<string, string> = {};
 
     let ws: WebSocket | null = null;
     let consoleContainer: HTMLElement;
@@ -55,6 +57,28 @@
             error = e.message;
         } finally {
             loading = false;
+        }
+    }
+
+    async function fetchProperties() {
+        try {
+            const res = await api.get(`/api/servers/${serverId}/properties`);
+            properties = res.data;
+        } catch (e) {
+            console.error("Failed to fetch properties", e);
+            alert("Erreur lors du chargement de la configuration");
+        }
+    }
+
+    async function saveProperties() {
+        try {
+            await api.post(`/api/servers/${serverId}/properties`, properties);
+            alert(
+                "Configuration sauvegardée ! Redémarrez le serveur pour appliquer.",
+            );
+        } catch (e) {
+            console.error("Failed to save properties", e);
+            alert("Erreur lors de la sauvegarde");
         }
     }
 
@@ -152,6 +176,10 @@
         if (consoleContainer) {
             consoleContainer.scrollTop = consoleContainer.scrollHeight;
         }
+    }
+
+    $: if (activeTab === "configuration") {
+        fetchProperties();
     }
 </script>
 
@@ -287,13 +315,110 @@
                         Consultation des fichiers de logs (Bientôt)
                     </p>
                 </div>
+            {:else if activeTab === "configuration"}
+                <div class="space-y-8">
+                    {#each configGroups as group}
+                        <div>
+                            <h3
+                                class="text-xl font-semibold text-white mb-4 border-b border-gray-800 pb-2"
+                            >
+                                {group.title}
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {#each group.fields as field}
+                                    {@const f = field as any}
+                                    <div class="flex flex-col gap-2">
+                                        <label
+                                            class="text-sm font-medium text-gray-400"
+                                            for={f.key}
+                                        >
+                                            {f.label}
+                                        </label>
+                                        {#if f.type === "select"}
+                                            <select
+                                                id={f.key}
+                                                bind:value={properties[f.key]}
+                                                class="bg-slate-800 border border-gray-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                            >
+                                                {#each f.options || [] as option}
+                                                    <option value={option}
+                                                        >{option}</option
+                                                    >
+                                                {/each}
+                                            </select>
+                                        {:else if f.type === "boolean"}
+                                            <div
+                                                class="flex items-center h-[42px]"
+                                            >
+                                                <button
+                                                    on:click={() =>
+                                                        (properties[f.key] =
+                                                            properties[
+                                                                f.key
+                                                            ] === "true"
+                                                                ? "false"
+                                                                : "true")}
+                                                    class="relative w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 cursor-pointer {properties[
+                                                        f.key
+                                                    ] === 'true'
+                                                        ? 'bg-green-600'
+                                                        : 'bg-gray-700'}"
+                                                >
+                                                    <span
+                                                        class="absolute top-[2px] start-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-transform {properties[
+                                                            f.key
+                                                        ] === 'true'
+                                                            ? 'translate-x-[20px] border-white'
+                                                            : 'translate-x-0'}"
+                                                    ></span>
+                                                </button>
+                                                <span
+                                                    class="ms-3 text-sm font-medium {properties[
+                                                        f.key
+                                                    ] === 'true'
+                                                        ? 'text-green-400'
+                                                        : 'text-gray-400'}"
+                                                >
+                                                    {properties[f.key] ===
+                                                    "true"
+                                                        ? "Activé"
+                                                        : "Désactivé"}
+                                                </span>
+                                            </div>
+                                        {:else}
+                                            <input
+                                                type={f.type}
+                                                id={f.key}
+                                                bind:value={properties[f.key]}
+                                                min={f.min}
+                                                max={f.max}
+                                                class="bg-slate-800 border border-gray-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                            />
+                                        {/if}
+                                    </div>
+                                {/each}
+                            </div>
+                        </div>
+                    {/each}
+
+                    <div class="sticky bottom-6 flex justify-end pt-4">
+                        <button
+                            on:click={saveProperties}
+                            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-transform hover:scale-105 font-medium"
+                        >
+                            <Save size={20} />
+                            Sauvegarder la configuration
+                        </button>
+                    </div>
+                </div>
             {:else}
                 <div
                     class="flex flex-col items-center justify-center h-64 text-gray-400"
                 >
                     <Folder size={48} class="mb-4 opacity-50" />
                     <p class="text-lg">
-                        Section {activeTab} en cours de développement
+                        Section {tabs.find((t) => t.id === activeTab)?.label} en
+                        cours de développement
                     </p>
                 </div>
             {/if}

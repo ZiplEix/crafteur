@@ -1,20 +1,24 @@
-<script>
+<script lang="ts">
     import { X } from "lucide-svelte";
-    import { servers } from "$lib/stores.js";
+    import { servers } from "$lib/stores";
     import { api } from "$lib/api";
 
-    let { isOpen, onClose, onServerCreated = () => {} } = $props();
+    interface Props {
+        isOpen: boolean;
+        onClose: () => void;
+        onServerCreated?: () => void;
+    }
+
+    let { isOpen, onClose, onServerCreated = () => {} }: Props = $props();
 
     let name = $state("");
     let port = $state(25565);
     let ram = $state(2048);
     let loading = $state(false);
 
-    /** @type {string | null} */
-    let error = $state(null);
+    let error: string | null = $state(null);
 
-    /** @param {Event} e */
-    async function handleSubmit(e) {
+    async function handleSubmit(e: Event) {
         e.preventDefault();
         loading = true;
         error = null;
@@ -39,10 +43,8 @@
 
             onServerCreated();
             onClose();
-        } catch (err) {
-            // @ts-ignore
+        } catch (err: any) {
             if (err.response && err.response.data && err.response.data.error) {
-                // @ts-ignore
                 error = err.response.data.error;
             } else if (err instanceof Error) {
                 error = err.message;
