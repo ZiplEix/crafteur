@@ -24,3 +24,18 @@ type ServerConfig struct {
 	RAM         int        `json:"ram"`
 	JavaVersion int        `json:"java_version"`
 }
+
+type User struct {
+	ID           string `json:"id"`
+	Username     string `json:"username"`
+	PasswordHash string `json:"-"`
+}
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type AuthResponse struct {
+	Token string `json:"token"`
+}

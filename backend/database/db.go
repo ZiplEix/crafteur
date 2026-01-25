@@ -29,6 +29,12 @@ func InitDB() {
 		port INTEGER,
 		ram INTEGER DEFAULT 2048,
 		java_version INTEGER DEFAULT 21
+	);
+	
+	CREATE TABLE IF NOT EXISTS users (
+		id TEXT PRIMARY KEY,
+		username TEXT UNIQUE,
+		password_hash TEXT
 	);`
 
 	if _, err := DB.Exec(query); err != nil {

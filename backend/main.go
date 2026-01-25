@@ -2,9 +2,12 @@ package main
 
 import (
 	"embed"
+	"flag"
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/ZiplEix/crafteur/controller"
 	"github.com/ZiplEix/crafteur/database"
@@ -28,6 +31,25 @@ func getFileSystem() http.FileSystem {
 
 func main() {
 	database.InitDB()
+
+	// CLI Flags for user creation
+	createUser := flag.String("create-user", "", "Create a new user")
+	password := flag.String("password", "", "Password for the new user")
+	flag.Parse()
+
+	if *createUser != "" {
+		if *password == "" {
+			fmt.Println("Error: Password is required when creating a user")
+			os.Exit(1)
+		}
+		err := services.Register(*createUser, *password)
+		if err != nil {
+			fmt.Printf("Error creating user: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("User '%s' created successfully.\n", *createUser)
+		os.Exit(0)
+	}
 
 	mcManager := minecraft.NewManager()
 	serverService := services.NewServerService(mcManager)

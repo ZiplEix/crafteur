@@ -2,18 +2,34 @@ package routes
 
 import (
 	"github.com/ZiplEix/crafteur/controller"
+	"github.com/ZiplEix/crafteur/services"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
 func Register(e *echo.Echo, serverCtrl *controller.ServerController) {
 	api := e.Group("/api")
 
-	api.GET("/servers", serverCtrl.Index)
-	api.POST("/servers", serverCtrl.Create)
+	// Public Routes
+	api.POST("/login", controller.Login)
 
-	api.POST("/servers/:id/start", serverCtrl.Start)
-	api.POST("/servers/:id/stop", serverCtrl.Stop)
-	api.POST("/servers/:id/command", serverCtrl.Command)
+	// Protected Routes
+	protected := api.Group("")
+	config := echojwt.Config{
+		SigningKey:  services.SecretKey,
+		TokenLookup: "cookie:auth_token",
+	}
+	protected.Use(echojwt.WithConfig(config))
 
-	api.GET("/servers/:id/ws", serverCtrl.Console)
+	protected.GET("/me", controller.Me)
+	protected.POST("/logout", controller.Logout)
+
+	protected.GET("/servers", serverCtrl.Index)
+	protected.POST("/servers", serverCtrl.Create)
+
+	protected.POST("/servers/:id/start", serverCtrl.Start)
+	protected.POST("/servers/:id/stop", serverCtrl.Stop)
+	protected.POST("/servers/:id/command", serverCtrl.Command)
+
+	protected.GET("/servers/:id/ws", serverCtrl.Console)
 }
