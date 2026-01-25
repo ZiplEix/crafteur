@@ -21,17 +21,38 @@ type Instance struct {
 	status core.ServerStatus
 	mu     sync.RWMutex
 
-	Output chan string
+	subscribers []chan string
+	subMu       sync.Mutex
 }
 
 func NewInstance(id string, runDir, jarName string) *Instance {
 	return &Instance{
-		ID:       id,
-		RunDir:   runDir,
-		JarName:  jarName,
-		JavaArgs: []string{"-Xmx1G", "-Xms1G"},
-		status:   core.StatusStopped,
-		Output:   make(chan string, 100),
+		ID:          id,
+		RunDir:      runDir,
+		JarName:     jarName,
+		JavaArgs:    []string{"-Xmx1G", "-Xms1G"},
+		status:      core.StatusStopped,
+		subscribers: make([]chan string, 0),
+	}
+}
+
+func (i *Instance) Subscribe() chan string {
+	i.subMu.Lock()
+	defer i.subMu.Unlock()
+	ch := make(chan string, 100)
+	i.subscribers = append(i.subscribers, ch)
+	return ch
+}
+
+func (i *Instance) Unsubscribe(ch chan string) {
+	i.subMu.Lock()
+	defer i.subMu.Unlock()
+	for idx, sub := range i.subscribers {
+		if sub == ch {
+			i.subscribers = append(i.subscribers[:idx], i.subscribers[idx+1:]...)
+			close(ch)
+			break
+		}
 	}
 }
 
@@ -135,8 +156,12 @@ func (i *Instance) SendCommand(cmd string) error {
 }
 
 func (i *Instance) broadcast(msg string) {
-	select {
-	case i.Output <- msg:
-	default:
+	i.subMu.Lock()
+	defer i.subMu.Unlock()
+	for _, ch := range i.subscribers {
+		select {
+		case ch <- msg:
+		default:
+		}
 	}
 }

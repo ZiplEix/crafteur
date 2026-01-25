@@ -39,3 +39,13 @@ type LoginRequest struct {
 type AuthResponse struct {
 	Token string `json:"token"`
 }
+
+type ServerDetailResponse struct {
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	Type        ServerType   `json:"type"`
+	Port        int          `json:"port"`
+	RAM         int          `json:"ram"`
+	JavaVersion int          `json:"java_version"`
+	Status      ServerStatus `json:"status"`
+}

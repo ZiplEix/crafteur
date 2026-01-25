@@ -34,6 +34,16 @@ func (ctrl *ServerController) Index(c echo.Context) error {
 	return c.JSON(http.StatusOK, servers)
 }
 
+// GET /api/servers/:id
+func (ctrl *ServerController) GetOne(c echo.Context) error {
+	id := c.Param("id")
+	detail, err := ctrl.service.GetServerDetail(id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Server not found"})
+	}
+	return c.JSON(http.StatusOK, detail)
+}
+
 // POST /api/servers
 type CreateServerRequest struct {
 	Name string          `json:"name"`
@@ -93,10 +103,11 @@ func (ctrl *ServerController) Command(c echo.Context) error {
 func (ctrl *ServerController) Console(c echo.Context) error {
 	id := c.Param("id")
 
-	stream, err := ctrl.service.GetConsoleStream(id)
+	stream, cleanup, err := ctrl.service.SubscribeConsole(id)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Server not found"})
 	}
+	defer cleanup()
 
 	ws, err := ctrl.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {

@@ -94,7 +94,7 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 func (s *ServerService) StartServer(id string) error {
 	inst, exists := s.manager.GetInstance(id)
 	if !exists {
-		return fmt.Errorf("serveur introuvable (id: %d)", id)
+		return fmt.Errorf("serveur introuvable (id: %s)", id)
 	}
 	return inst.Start()
 }
@@ -115,14 +115,43 @@ func (s *ServerService) SendCommand(id string, cmd string) error {
 	return inst.SendCommand(cmd)
 }
 
-func (s *ServerService) GetConsoleStream(id string) (chan string, error) {
+func (s *ServerService) SubscribeConsole(id string) (chan string, func(), error) {
 	inst, exists := s.manager.GetInstance(id)
 	if !exists {
-		return nil, fmt.Errorf("serveur introuvable")
+		return nil, nil, fmt.Errorf("serveur introuvable")
 	}
-	return inst.Output, nil
+	ch := inst.Subscribe()
+	cleanup := func() {
+		inst.Unsubscribe(ch)
+	}
+	return ch, cleanup, nil
 }
 
 func (s *ServerService) GetAllServers() ([]core.ServerConfig, error) {
 	return database.GetAllServers()
+}
+
+func (s *ServerService) GetServerDetail(id string) (*core.ServerDetailResponse, error) {
+	// 1. Config from DB
+	cfg, err := database.GetServer(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. Runtime status
+	status := core.StatusStopped
+	inst, exists := s.manager.GetInstance(id)
+	if exists {
+		status = inst.GetStatus()
+	}
+
+	return &core.ServerDetailResponse{
+		ID:          cfg.ID,
+		Name:        cfg.Name,
+		Type:        cfg.Type,
+		Port:        cfg.Port,
+		RAM:         cfg.RAM,
+		JavaVersion: cfg.JavaVersion,
+		Status:      status,
+	}, nil
 }

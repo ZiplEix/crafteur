@@ -25,6 +25,7 @@ func Register(e *echo.Echo, serverCtrl *controller.ServerController) {
 	protected.POST("/logout", controller.Logout)
 
 	protected.GET("/servers", serverCtrl.Index)
+	protected.GET("/servers/:id", serverCtrl.GetOne)
 	protected.POST("/servers", serverCtrl.Create)
 
 	protected.POST("/servers/:id/start", serverCtrl.Start)

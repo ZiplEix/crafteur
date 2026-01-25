@@ -20,6 +20,15 @@ func GetAllServers() ([]core.ServerConfig, error) {
 	return servers, nil
 }
 
+func GetServer(id string) (*core.ServerConfig, error) {
+	var s core.ServerConfig
+	err := DB.QueryRow("SELECT id, name, type, port, ram, java_version FROM servers WHERE id = ?", id).Scan(&s.ID, &s.Name, &s.Type, &s.Port, &s.RAM, &s.JavaVersion)
+	if err != nil {
+		return nil, err
+	}
+	return &s, nil
+}
+
 func CreateServer(s *core.ServerConfig) error {
 	_, err := DB.Exec(
 		"INSERT INTO servers (id, name, type, port, ram, java_version) VALUES (?, ?, ?, ?, ?, ?)",
