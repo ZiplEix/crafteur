@@ -115,6 +115,14 @@ func (ctrl *ServerController) Console(c echo.Context) error {
 	}
 	defer ws.Close()
 
+	// Send history
+	history, _ := ctrl.service.GetServerLogHistory(id)
+	for _, line := range history {
+		if err := ws.WriteMessage(websocket.TextMessage, []byte(line)); err != nil {
+			break
+		}
+	}
+
 	for line := range stream {
 		if err := ws.WriteMessage(websocket.TextMessage, []byte(line)); err != nil {
 			break

@@ -127,6 +127,14 @@ func (s *ServerService) SubscribeConsole(id string) (chan string, func(), error)
 	return ch, cleanup, nil
 }
 
+func (s *ServerService) GetServerLogHistory(id string) ([]string, error) {
+	inst, exists := s.manager.GetInstance(id)
+	if !exists {
+		return nil, fmt.Errorf("serveur introuvable")
+	}
+	return inst.GetHistory(), nil
+}
+
 func (s *ServerService) GetAllServers() ([]core.ServerConfig, error) {
 	return database.GetAllServers()
 }

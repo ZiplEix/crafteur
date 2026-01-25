@@ -23,6 +23,8 @@ type Instance struct {
 
 	subscribers []chan string
 	subMu       sync.Mutex
+
+	logs []string
 }
 
 func NewInstance(id string, runDir, jarName string) *Instance {
@@ -33,6 +35,7 @@ func NewInstance(id string, runDir, jarName string) *Instance {
 		JavaArgs:    []string{"-Xmx1G", "-Xms1G"},
 		status:      core.StatusStopped,
 		subscribers: make([]chan string, 0),
+		logs:        make([]string, 0),
 	}
 }
 
@@ -54,6 +57,15 @@ func (i *Instance) Unsubscribe(ch chan string) {
 			break
 		}
 	}
+}
+
+func (i *Instance) GetHistory() []string {
+	i.subMu.Lock()
+	defer i.subMu.Unlock()
+	// Return a copy to be safe
+	history := make([]string, len(i.logs))
+	copy(history, i.logs)
+	return history
 }
 
 func (i *Instance) GetStatus() core.ServerStatus {
@@ -158,6 +170,12 @@ func (i *Instance) SendCommand(cmd string) error {
 func (i *Instance) broadcast(msg string) {
 	i.subMu.Lock()
 	defer i.subMu.Unlock()
+
+	i.logs = append(i.logs, msg)
+	if len(i.logs) > 100 {
+		i.logs = i.logs[1:]
+	}
+
 	for _, ch := range i.subscribers {
 		select {
 		case ch <- msg:
