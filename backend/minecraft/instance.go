@@ -10,6 +10,11 @@ import (
 	"github.com/ZiplEix/crafteur/core"
 )
 
+type WSMessage struct {
+	Type string `json:"type"`
+	Data string `json:"data"`
+}
+
 type Instance struct {
 	ID       string
 	RunDir   string
@@ -21,7 +26,7 @@ type Instance struct {
 	status core.ServerStatus
 	mu     sync.RWMutex
 
-	subscribers []chan string
+	subscribers []chan WSMessage
 	subMu       sync.Mutex
 
 	logs []string
@@ -34,20 +39,20 @@ func NewInstance(id string, runDir, jarName string) *Instance {
 		JarName:     jarName,
 		JavaArgs:    []string{"-Xmx1G", "-Xms1G"},
 		status:      core.StatusStopped,
-		subscribers: make([]chan string, 0),
+		subscribers: make([]chan WSMessage, 0),
 		logs:        make([]string, 0),
 	}
 }
 
-func (i *Instance) Subscribe() chan string {
+func (i *Instance) Subscribe() chan WSMessage {
 	i.subMu.Lock()
 	defer i.subMu.Unlock()
-	ch := make(chan string, 100)
+	ch := make(chan WSMessage, 100)
 	i.subscribers = append(i.subscribers, ch)
 	return ch
 }
 
-func (i *Instance) Unsubscribe(ch chan string) {
+func (i *Instance) Unsubscribe(ch chan WSMessage) {
 	i.subMu.Lock()
 	defer i.subMu.Unlock()
 	for idx, sub := range i.subscribers {
@@ -76,8 +81,10 @@ func (i *Instance) GetStatus() core.ServerStatus {
 
 func (i *Instance) SetStatus(status core.ServerStatus) {
 	i.mu.Lock()
-	defer i.mu.Unlock()
 	i.status = status
+	i.mu.Unlock()
+
+	i.broadcast(WSMessage{Type: "status", Data: string(status)})
 }
 
 func (i *Instance) Start() error {
@@ -88,6 +95,8 @@ func (i *Instance) Start() error {
 	}
 	i.status = core.StatusStarting
 	i.mu.Unlock()
+
+	i.broadcast(WSMessage{Type: "status", Data: string(core.StatusStarting)})
 
 	args := append(i.JavaArgs, "-jar", i.JarName, "nogui")
 	i.cmd = exec.Command("java", args...)
@@ -113,7 +122,7 @@ func (i *Instance) Start() error {
 	}
 
 	i.SetStatus(core.StatusRunning)
-	i.broadcast("--- PROCESS START ---")
+	i.broadcastLog("--- PROCESS START ---")
 
 	go i.monitorProcess(stdout)
 
@@ -124,13 +133,13 @@ func (i *Instance) monitorProcess(stdout io.Reader) {
 	scanner := bufio.NewScanner(stdout)
 	for scanner.Scan() {
 		text := scanner.Text()
-		i.broadcast(text)
+		i.broadcastLog(text)
 	}
 
 	if err := i.cmd.Wait(); err != nil {
-		i.broadcast(fmt.Sprintf("--- CRASH/STOP ERROR: %v ---", err))
+		i.broadcastLog(fmt.Sprintf("--- CRASH/STOP ERROR: %v ---", err))
 	} else {
-		i.broadcast("--- PROCESS STOPPED GRACEFULLY ---")
+		i.broadcastLog("--- PROCESS STOPPED GRACEFULLY ---")
 	}
 
 	i.SetStatus(core.StatusStopped)
@@ -167,7 +176,7 @@ func (i *Instance) SendCommand(cmd string) error {
 	return err
 }
 
-func (i *Instance) broadcast(msg string) {
+func (i *Instance) broadcastLog(msg string) {
 	i.subMu.Lock()
 	defer i.subMu.Unlock()
 
@@ -175,6 +184,20 @@ func (i *Instance) broadcast(msg string) {
 	if len(i.logs) > 100 {
 		i.logs = i.logs[1:]
 	}
+
+	message := WSMessage{Type: "log", Data: msg}
+
+	for _, ch := range i.subscribers {
+		select {
+		case ch <- message:
+		default:
+		}
+	}
+}
+
+func (i *Instance) broadcast(msg WSMessage) {
+	i.subMu.Lock()
+	defer i.subMu.Unlock()
 
 	for _, ch := range i.subscribers {
 		select {

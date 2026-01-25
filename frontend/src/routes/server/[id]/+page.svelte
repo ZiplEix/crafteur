@@ -14,6 +14,7 @@
         Square,
         RotateCw,
     } from "lucide-svelte";
+    import FileManager from "$lib/components/FileManager.svelte";
 
     interface ServerDetail {
         id: string;
@@ -61,8 +62,7 @@
         if (!server) return;
         try {
             await api.post(`/api/servers/${server.id}/${action}`);
-            // Refresh status shortly after action
-            setTimeout(fetchServer, 1000);
+            // Status will be updated via WebSocket
             if (action === "start") {
                 server.status = "STARTING";
             } else if (action === "stop") {
@@ -96,13 +96,22 @@
         }
     }
 
+    onMount(() => {
+        fetchServer();
+        connectWS();
+    });
+
+    onDestroy(() => {
+        if (ws) {
+            ws.close();
+        }
+    });
+
     function connectWS() {
         if (ws) {
             ws.close();
         }
 
-        // Assuming backend is on localhost:8080 as per api.ts
-        // In prod this should be dynamic, but following api.ts pattern for now
         const wsUrl = `ws://localhost:8080/api/servers/${serverId}/ws`;
 
         ws = new WebSocket(wsUrl);
@@ -112,12 +121,24 @@
         };
 
         ws.onmessage = (event) => {
-            logs = [...logs, event.data];
-            scrollToBottom();
+            try {
+                const msg = JSON.parse(event.data);
+                if (msg.type === "log") {
+                    logs = [...logs, msg.data];
+                    if (activeTab === "console") {
+                        scrollToBottom();
+                    }
+                } else if (msg.type === "status" && server) {
+                    server.status = msg.data;
+                }
+            } catch (e) {
+                console.error("Failed to parse WS message", e);
+            }
         };
 
         ws.onclose = () => {
             logs = [...logs, "--- Connection Closed ---"];
+            // Reconnect logic could go here
         };
 
         ws.onerror = (e) => {
@@ -131,30 +152,6 @@
         if (consoleContainer) {
             consoleContainer.scrollTop = consoleContainer.scrollHeight;
         }
-    }
-
-    onMount(() => {
-        fetchServer();
-        // Poll status every 5 seconds to keep UI fresh
-        const interval = setInterval(fetchServer, 5000);
-
-        if (activeTab === "console") {
-            connectWS();
-        }
-
-        return () => {
-            clearInterval(interval);
-        };
-    });
-
-    onDestroy(() => {
-        if (ws) {
-            ws.close();
-        }
-    });
-
-    $: if (activeTab === "console" && !ws && server) {
-        connectWS();
     }
 </script>
 
@@ -276,6 +273,10 @@
                             class="flex-1 bg-black text-gray-200 p-3 font-mono border-b border-r border-gray-800 rounded-br-lg focus:outline-none focus:bg-gray-950 transition-colors"
                         />
                     </form>
+                </div>
+            {:else if activeTab === "file"}
+                <div>
+                    <FileManager serverId={server.id} />
                 </div>
             {:else if activeTab === "log"}
                 <div

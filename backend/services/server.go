@@ -115,7 +115,7 @@ func (s *ServerService) SendCommand(id string, cmd string) error {
 	return inst.SendCommand(cmd)
 }
 
-func (s *ServerService) SubscribeConsole(id string) (chan string, func(), error) {
+func (s *ServerService) SubscribeConsole(id string) (chan minecraft.WSMessage, func(), error) {
 	inst, exists := s.manager.GetInstance(id)
 	if !exists {
 		return nil, nil, fmt.Errorf("serveur introuvable")

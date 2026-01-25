@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ZiplEix/crafteur/core"
+	"github.com/ZiplEix/crafteur/minecraft"
 	"github.com/ZiplEix/crafteur/services"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -118,13 +119,14 @@ func (ctrl *ServerController) Console(c echo.Context) error {
 	// Send history
 	history, _ := ctrl.service.GetServerLogHistory(id)
 	for _, line := range history {
-		if err := ws.WriteMessage(websocket.TextMessage, []byte(line)); err != nil {
+		msg := minecraft.WSMessage{Type: "log", Data: line}
+		if err := ws.WriteJSON(msg); err != nil {
 			break
 		}
 	}
 
-	for line := range stream {
-		if err := ws.WriteMessage(websocket.TextMessage, []byte(line)); err != nil {
+	for msg := range stream {
+		if err := ws.WriteJSON(msg); err != nil {
 			break
 		}
 	}

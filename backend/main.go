@@ -58,7 +58,14 @@ func main() {
 		log.Fatal("Can't load servers at startup:", err)
 	}
 
+	// File Service assuming data is in "backend/data/servers" relative to running dir, or just "data/servers"
+	// Based on instance.go NewInstance, RunDir seems to be passed by manager.
+	// The Manager likely knows the root. Let's assume data root is "./data/servers" for now or extraction from manager if possible.
+	// Looking at previous ls output: backend/data/servers exists.
+	fileService := services.NewFileService(mcManager, "data/servers")
+
 	serverCtrl := controller.NewServerController(serverService)
+	fileCtrl := controller.NewFileController(fileService)
 
 	e := echo.New()
 
@@ -72,7 +79,7 @@ func main() {
 		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 
-	routes.Register(e, serverCtrl)
+	routes.Register(e, serverCtrl, fileCtrl)
 
 	assetHandler := http.FileServer(getFileSystem())
 	e.GET("/*", echo.WrapHandler(assetHandler))
