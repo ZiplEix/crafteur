@@ -17,6 +17,7 @@
     import { configGroups } from "$lib/config_schema";
     import FileManager from "$lib/components/FileManager.svelte";
     import PlayerManager from "$lib/components/PlayerManager.svelte";
+    import LogViewer from "$lib/components/LogViewer.svelte";
 
     interface ServerDetail {
         id: string;
@@ -312,13 +313,8 @@
                     <PlayerManager serverId={server.id} />
                 </div>
             {:else if activeTab === "log"}
-                <div
-                    class="flex flex-col items-center justify-center h-64 text-gray-400"
-                >
-                    <FileText size={48} class="mb-4 opacity-50" />
-                    <p class="text-lg">
-                        Consultation des fichiers de logs (Bientôt)
-                    </p>
+                <div>
+                    <LogViewer serverId={server.id} />
                 </div>
             {:else if activeTab === "configuration"}
                 <div class="space-y-8">

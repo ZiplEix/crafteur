@@ -64,10 +64,12 @@ func main() {
 	// Looking at previous ls output: backend/data/servers exists.
 	fileService := services.NewFileService(mcManager, "data/servers")
 	playerService := services.NewPlayerService(mcManager, "data")
+	logService := services.NewLogService("data/servers")
 
 	serverCtrl := controller.NewServerController(serverService)
 	fileCtrl := controller.NewFileController(fileService)
 	playerCtrl := controller.NewPlayerController(playerService, serverService)
+	logCtrl := controller.NewLogController(logService)
 
 	e := echo.New()
 
@@ -81,7 +83,7 @@ func main() {
 		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 
-	routes.Register(e, serverCtrl, fileCtrl, playerCtrl)
+	routes.Register(e, serverCtrl, fileCtrl, playerCtrl, logCtrl)
 
 	assetHandler := http.FileServer(getFileSystem())
 	e.GET("/*", echo.WrapHandler(assetHandler))
