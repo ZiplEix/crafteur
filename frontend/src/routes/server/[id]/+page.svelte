@@ -18,6 +18,7 @@
     import FileManager from "$lib/components/FileManager.svelte";
     import PlayerManager from "$lib/components/PlayerManager.svelte";
     import LogViewer from "$lib/components/LogViewer.svelte";
+    import BackupManager from "$lib/components/BackupManager.svelte";
 
     interface ServerDetail {
         id: string;
@@ -45,7 +46,7 @@
         { id: "console", label: "Console", icon: Terminal },
         { id: "log", label: "Log", icon: FileText },
         { id: "schedule", label: "Schedule", icon: Calendar },
-        { id: "save", label: "Save", icon: Save },
+        { id: "save", label: "Backups", icon: Save },
         { id: "file", label: "File", icon: Folder },
         { id: "configuration", label: "Configuration", icon: Settings },
         { id: "player", label: "Player", icon: Users },
@@ -412,6 +413,8 @@
                         </button>
                     </div>
                 </div>
+            {:else if activeTab === "save"}
+                <BackupManager serverId={server.id} />
             {:else}
                 <div
                     class="flex flex-col items-center justify-center h-64 text-gray-400"
