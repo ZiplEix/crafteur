@@ -63,9 +63,11 @@ func main() {
 	// The Manager likely knows the root. Let's assume data root is "./data/servers" for now or extraction from manager if possible.
 	// Looking at previous ls output: backend/data/servers exists.
 	fileService := services.NewFileService(mcManager, "data/servers")
+	playerService := services.NewPlayerService(mcManager, "data")
 
 	serverCtrl := controller.NewServerController(serverService)
 	fileCtrl := controller.NewFileController(fileService)
+	playerCtrl := controller.NewPlayerController(playerService, serverService)
 
 	e := echo.New()
 
@@ -79,7 +81,7 @@ func main() {
 		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 
-	routes.Register(e, serverCtrl, fileCtrl)
+	routes.Register(e, serverCtrl, fileCtrl, playerCtrl)
 
 	assetHandler := http.FileServer(getFileSystem())
 	e.GET("/*", echo.WrapHandler(assetHandler))

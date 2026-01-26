@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"regexp"
 	"sync"
 
 	"github.com/ZiplEix/crafteur/core"
@@ -30,17 +31,21 @@ type Instance struct {
 	subMu       sync.Mutex
 
 	logs []string
+
+	ConnectedPlayers map[string]bool
+	playersMu        sync.RWMutex
 }
 
 func NewInstance(id string, runDir, jarName string) *Instance {
 	return &Instance{
-		ID:          id,
-		RunDir:      runDir,
-		JarName:     jarName,
-		JavaArgs:    []string{"-Xmx1G", "-Xms1G"},
-		status:      core.StatusStopped,
-		subscribers: make([]chan WSMessage, 0),
-		logs:        make([]string, 0),
+		ID:               id,
+		RunDir:           runDir,
+		JarName:          jarName,
+		JavaArgs:         []string{"-Xmx1G", "-Xms1G"},
+		status:           core.StatusStopped,
+		subscribers:      make([]chan WSMessage, 0),
+		logs:             make([]string, 0),
+		ConnectedPlayers: make(map[string]bool),
 	}
 }
 
@@ -87,6 +92,18 @@ func (i *Instance) SetStatus(status core.ServerStatus) {
 	i.broadcast(WSMessage{Type: "status", Data: string(status)})
 }
 
+// Helper to check if player is online
+func (i *Instance) IsPlayerOnline(name string) bool {
+	i.playersMu.RLock()
+	defer i.playersMu.RUnlock()
+	return i.ConnectedPlayers[name]
+}
+
+var (
+	joinRegex  = regexp.MustCompile(`]: (\w+) joined the game`)
+	leaveRegex = regexp.MustCompile(`]: (\w+) left the game`)
+)
+
 func (i *Instance) Start() error {
 	i.mu.Lock()
 	if i.status != core.StatusStopped {
@@ -130,10 +147,31 @@ func (i *Instance) Start() error {
 }
 
 func (i *Instance) monitorProcess(stdout io.Reader) {
+	// Reset players on start
+	i.playersMu.Lock()
+	i.ConnectedPlayers = make(map[string]bool)
+	i.playersMu.Unlock()
+
 	scanner := bufio.NewScanner(stdout)
 	for scanner.Scan() {
 		text := scanner.Text()
 		i.broadcastLog(text)
+
+		// Parse Join
+		if matches := joinRegex.FindStringSubmatch(text); len(matches) > 1 {
+			player := matches[1]
+			i.playersMu.Lock()
+			i.ConnectedPlayers[player] = true
+			i.playersMu.Unlock()
+		}
+
+		// Parse Leave
+		if matches := leaveRegex.FindStringSubmatch(text); len(matches) > 1 {
+			player := matches[1]
+			i.playersMu.Lock()
+			delete(i.ConnectedPlayers, player)
+			i.playersMu.Unlock()
+		}
 	}
 
 	if err := i.cmd.Wait(); err != nil {
@@ -141,6 +179,11 @@ func (i *Instance) monitorProcess(stdout io.Reader) {
 	} else {
 		i.broadcastLog("--- PROCESS STOPPED GRACEFULLY ---")
 	}
+
+	// Clear players on stop
+	i.playersMu.Lock()
+	i.ConnectedPlayers = make(map[string]bool)
+	i.playersMu.Unlock()
 
 	i.SetStatus(core.StatusStopped)
 	i.cmd = nil

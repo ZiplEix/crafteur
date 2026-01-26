@@ -16,6 +16,7 @@
     } from "lucide-svelte";
     import { configGroups } from "$lib/config_schema";
     import FileManager from "$lib/components/FileManager.svelte";
+    import PlayerManager from "$lib/components/PlayerManager.svelte";
 
     interface ServerDetail {
         id: string;
@@ -305,6 +306,10 @@
             {:else if activeTab === "file"}
                 <div>
                     <FileManager serverId={server.id} />
+                </div>
+            {:else if activeTab === "player"}
+                <div>
+                    <PlayerManager serverId={server.id} />
                 </div>
             {:else if activeTab === "log"}
                 <div
