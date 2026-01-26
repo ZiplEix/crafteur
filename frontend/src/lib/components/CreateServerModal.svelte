@@ -11,6 +11,10 @@
 
     let { isOpen, onClose, onServerCreated = () => {} }: Props = $props();
 
+    $effect(() => {
+        console.log("CreateServerModal: isOpen prop changed:", isOpen);
+    });
+
     let name = $state("");
     let port = $state(25565);
     let ram = $state(2048);
@@ -59,7 +63,7 @@
 
 {#if isOpen}
     <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
     >
         <div
             class="w-full max-w-md bg-slate-800 rounded-xl border border-slate-700 shadow-2xl overflow-hidden"

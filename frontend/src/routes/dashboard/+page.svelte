@@ -15,7 +15,7 @@
 
             // Load servers
             const resServers = await api.get("/api/servers");
-            servers.set(resServers.data);
+            servers.set(resServers.data || []);
         } catch (e) {
             console.error(e);
             // Redirection is handled by interceptor but we catch here to stop execution
