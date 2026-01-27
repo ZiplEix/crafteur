@@ -20,7 +20,7 @@ Crafteur est une plateforme complète qui vous permet de :
 Pour installer Crafteur sur votre serveur Ubuntu/Debian :
 
 ```bash
-curl -sL https://get.crafteur.io | sudo bash
+curl -sL https://get.crafteur.fr | sudo bash
 ```
 
 ## Prochaines Étapes

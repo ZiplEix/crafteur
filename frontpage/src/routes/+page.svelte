@@ -19,7 +19,7 @@
     } from "lucide-svelte";
 
     let copied = $state(false);
-    const installCommand = "curl -sL https://get.crafteur.io | sudo bash";
+    const installCommand = "curl -sL https://get.crafteur.fr | sudo bash";
 
     function copyToClipboard() {
         navigator.clipboard.writeText(installCommand);
