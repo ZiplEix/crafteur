@@ -83,8 +83,8 @@ systemctl daemon-reload
 
 # 5. Initialisation Admin
 echo -e "${GREEN}Initialisation du compte Admin${NC}"
-read -p "Entrez le nom d'utilisateur Admin : " ADMIN_USER
-read -s -p "Entrez le mot de passe : " ADMIN_PASS
+read -p "Entrez le nom d'utilisateur Admin : " ADMIN_USER < /dev/tty
+read -s -p "Entrez le mot de passe : " ADMIN_PASS < /dev/tty
 echo ""
 
 if [ -z "$ADMIN_USER" ] || [ -z "$ADMIN_PASS" ]; then
