@@ -131,7 +131,7 @@
 
     // Reload when tab changes
     $: if (activeTab) {
-        if (activeTab !== "mods") {
+        if (activeTab !== "mods" && activeTab !== "plugins") {
             viewMode = "installed";
         }
         loadAddons();
@@ -159,7 +159,7 @@
                 {/each}
             </div>
 
-            {#if activeTab === "mods"}
+            {#if activeTab === "mods" || activeTab === "plugins"}
                 <div
                     class="flex bg-gray-800/50 p-1 rounded-lg border-l border-gray-700 pl-1 ml-2"
                 >
@@ -304,7 +304,11 @@
                 </div>
             {/if}
         </div>
-    {:else if viewMode === "catalog" && activeTab === "mods"}
-        <ModrinthBrowser {serverId} installedAddons={files} />
+    {:else if viewMode === "catalog" && (activeTab === "mods" || activeTab === "plugins")}
+        <ModrinthBrowser
+            {serverId}
+            installedAddons={files}
+            searchType={activeTab === "plugins" ? "plugin" : "mod"}
+        />
     {/if}
 </div>

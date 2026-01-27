@@ -22,8 +22,9 @@ func NewModrinthService(serverService *ServerService) *ModrinthService {
 	}
 }
 
-// SearchMods: facets examples: `["versions:1.20.1"]`, `["categories:fabric"]`
-func (s *ModrinthService) SearchMods(query string, limit int, offset int, facets []string) (*core.ModrinthSearchResponse, error) {
+// SearchProjects: facets examples: `["versions:1.20.1"]`, `["categories:fabric"]`
+// projectType: "mod" or "plugin"
+func (s *ModrinthService) SearchProjects(query string, limit int, offset int, facets []string, projectType string) (*core.ModrinthSearchResponse, error) {
 	baseUrl := "https://api.modrinth.com/v2/search"
 	u, err := url.Parse(baseUrl)
 	if err != nil {
@@ -41,21 +42,61 @@ func (s *ModrinthService) SearchMods(query string, limit int, offset int, facets
 		q.Set("offset", strconv.Itoa(offset))
 	}
 
-	// Facets must be a JSON array of arrays of strings: [["versions:1.20.1"], ["categories:fabric"]]
-	// We receive a flat list of simple filters that we need to group or format correctly.
-	// For simplicity, let's assume the caller passes properly formatted facet groups if needed,
-	// OR we assume AND logic between passed facets.
-	// Modrinth API expects: facets=[["versions:1.20.1"],["categories:fabric"]] for AND
-	if len(facets) > 0 {
-		// Convert flat slice to slice of slices for AND logic
-		var facetGroups [][]string
-		for _, f := range facets {
-			facetGroups = append(facetGroups, []string{f})
-		}
-		facetJson, err := json.Marshal(facetGroups)
-		if err == nil {
-			q.Set("facets", string(facetJson))
-		}
+	// Dynamic Facuts
+	// Base facets (coming from caller usually version): facets
+	// We want to append our projectType specific facets.
+
+	// Prepare simplified facet list.
+	// We assume `facets` passed in contains the version filter e.g. "versions:1.20.1"
+
+	// Filter by project type + loader/category
+	var typeFacets []string
+	if projectType == "plugin" {
+		typeFacets = []string{"project_type:plugin"}
+		// Plugin usually means bukkit/spigot/paper
+		// categories:bukkit OR categories:spigot OR categories:paper
+		// Modrinth API facets: [[A, B]] means A OR B. [[A], [B]] means A AND B.
+		// We want (Version) AND (Plugin) AND (Bukkit OR Spigot OR Paper)
+	} else {
+		typeFacets = []string{"project_type:mod"}
+		// Mod usually means Fabric or Forge (handled by caller passing "categories:fabric" in basic facets?
+		// Or we should handle it here like the controller did?)
+		// The controller was passing facets based on server type.
+		// Let's rely on controller passing the right loader facet for mods.
+	}
+
+	// Construct the final facet structure
+	// finalFacets = [ [passedFacets...], [project_type], [Categories...] ]
+	// Actually caller (Controller) constructs "versions:..." and "categories:fabric"
+	// We just need to add project_type filter.
+
+	var finalFacets [][]string
+
+	// Add passed facets (AND groups)
+	// We assumed caller passes flat string list and we grouped them individually (AND).
+	// But wait, the controller logic needs to be aligned.
+	// Previous: SearchMods took flat `facets` and did `facetGroups = append(facetGroups, []string{f})` -> AND logic.
+
+	for _, f := range facets {
+		finalFacets = append(finalFacets, []string{f})
+	}
+
+	// Add Project Type
+	if len(typeFacets) > 0 {
+		finalFacets = append(finalFacets, typeFacets)
+	}
+
+	// For Plugins, we want to expand the search to Bukkit/Spigot/Paper categories if not already present?
+	// The user request says:
+	// If plugin: Filter on `["categories:bukkit", "categories:spigot", "categories:paper"]` (OR logic).
+	if projectType == "plugin" {
+		pluginCats := []string{"categories:bukkit", "categories:spigot", "categories:paper"}
+		finalFacets = append(finalFacets, pluginCats)
+	}
+
+	facetJson, err := json.Marshal(finalFacets)
+	if err == nil {
+		q.Set("facets", string(facetJson))
 	}
 
 	u.RawQuery = q.Encode()
@@ -78,7 +119,7 @@ func (s *ModrinthService) SearchMods(query string, limit int, offset int, facets
 	return &searchResp, nil
 }
 
-func (s *ModrinthService) InstallMod(serverID string, projectID string) error {
+func (s *ModrinthService) InstallProject(serverID string, projectID string, projectType string) error {
 	// 1. Get Server Config
 	server, err := s.serverService.GetServer(serverID)
 	if err != nil {
@@ -86,18 +127,23 @@ func (s *ModrinthService) InstallMod(serverID string, projectID string) error {
 	}
 
 	// 2. Prepare Filters for Version Search
-	// loaders: ["fabric"] or ["forge"] (vanilla servers usually don't install mods, but let's assume fabric if compatible)
-	// game_versions: ["1.20.1"]
-
 	var loaders []string
-	if server.Type == core.TypeFabric {
-		loaders = append(loaders, "fabric")
-	} else if server.Type == core.TypeForge {
-		loaders = append(loaders, "forge")
+
+	if projectType == "plugin" {
+		// For plugins, loaders are "bukkit", "spigot", "paper", "purpur"?
+		// Actually Modrinth uses "bukkit", "spigot", "paper" as loaders too for plugins.
+		// Let's add them all to match broadly.
+		loaders = append(loaders, "bukkit", "spigot", "paper", "purpur")
+		// Ideally we match the server software but plugins are generally cross-compatible on these platforms.
 	} else {
-		// If vanilla, maybe don't allow? Or default to fabric?
-		// For now let's just use the type as loader if it matches, or error out.
-		return fmt.Errorf("server type %s supports no mods or is not configured", server.Type)
+		// Mods
+		if server.Type == core.TypeFabric {
+			loaders = append(loaders, "fabric")
+		} else if server.Type == core.TypeForge {
+			loaders = append(loaders, "forge")
+		} else {
+			return fmt.Errorf("server type %s supports no mods or is not configured", server.Type)
+		}
 	}
 
 	gameVersions := []string{server.Version}
@@ -135,7 +181,11 @@ func (s *ModrinthService) InstallMod(serverID string, projectID string) error {
 	}
 
 	if len(versions) == 0 {
-		return fmt.Errorf("no compatible version found for %s on %s", loaders[0], server.Version)
+		loaderStr := loaders[0]
+		if len(loaders) > 1 {
+			loaderStr = fmt.Sprintf("%v", loaders)
+		}
+		return fmt.Errorf("no compatible version found for %s on %s", loaderStr, server.Version)
 	}
 
 	// 4. Pick best version (first one is usually latest compatible)
@@ -159,7 +209,13 @@ func (s *ModrinthService) InstallMod(serverID string, projectID string) error {
 	}
 
 	// 6. Download
-	targetDir := filepath.Join(s.serverService.GetDataDir(), serverID, "mods")
+	// Determine folder based on type
+	folderName := "mods"
+	if projectType == "plugin" {
+		folderName = "plugins"
+	}
+
+	targetDir := filepath.Join(s.serverService.GetDataDir(), serverID, folderName)
 	if err := os.MkdirAll(targetDir, 0755); err != nil {
 		return err
 	}

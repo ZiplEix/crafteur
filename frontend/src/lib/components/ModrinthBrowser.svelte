@@ -17,6 +17,7 @@
 
     export let serverId: string;
     export let installedAddons: AddonFile[] = [];
+    export let searchType: "mod" | "plugin" = "mod";
 
     let query = "";
     let loading = false;
@@ -53,6 +54,7 @@
                     q: query,
                     serverId: serverId,
                     limit: 20,
+                    type: searchType,
                 },
             });
             const data: ModrinthSearchResponse = res.data;
@@ -79,6 +81,7 @@
             await api.post(`/api/modrinth/install`, {
                 serverId: serverId,
                 projectId: project.project_id,
+                type: searchType,
             });
             sessionInstalled[project.project_id] = true;
             // Maybe show a toast via a global store or event?
@@ -121,7 +124,9 @@
             type="text"
             bind:value={query}
             on:input={handleInput}
-            placeholder="Rechercher un mod (ex: JEI, Sodium, Create...)"
+            placeholder={searchType === "mod"
+                ? "Rechercher un mod (ex: JEI, Sodium, Create...)"
+                : "Rechercher un plugin (ex: Essentials, WorldEdit...)"}
             class="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-lg leading-5 bg-gray-900/50 text-gray-300 placeholder-gray-500 focus:outline-none focus:bg-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
         />
     </div>
@@ -131,10 +136,15 @@
         class="flex items-center gap-2 text-xs text-blue-400 bg-blue-500/10 p-3 rounded-lg border border-blue-500/20"
     >
         <Info size={16} />
-        <span
-            >Filtre automatique appliqué : Compatibilité vérifiée avec la
-            version et le type de votre serveur.</span
-        >
+        <span>
+            {#if searchType === "mod"}
+                Filtre automatique appliqué : Compatibilité vérifiée avec la
+                version et le type de votre serveur.
+            {:else}
+                Filtre automatique appliqué : Plugins compatibles
+                Spigot/Paper/Bukkit.
+            {/if}
+        </span>
     </div>
 
     <!-- Grid -->
