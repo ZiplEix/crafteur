@@ -23,7 +23,7 @@ func NewModrinthService(serverService *ServerService) *ModrinthService {
 }
 
 // SearchProjects: facets examples: `["versions:1.20.1"]`, `["categories:fabric"]`
-// projectType: "mod" or "plugin"
+// projectType: "mod", "plugin", or "datapack"
 func (s *ModrinthService) SearchProjects(query string, limit int, offset int, facets []string, projectType string) (*core.ModrinthSearchResponse, error) {
 	baseUrl := "https://api.modrinth.com/v2/search"
 	u, err := url.Parse(baseUrl)
@@ -57,6 +57,8 @@ func (s *ModrinthService) SearchProjects(query string, limit int, offset int, fa
 		// categories:bukkit OR categories:spigot OR categories:paper
 		// Modrinth API facets: [[A, B]] means A OR B. [[A], [B]] means A AND B.
 		// We want (Version) AND (Plugin) AND (Bukkit OR Spigot OR Paper)
+	} else if projectType == "datapack" {
+		typeFacets = []string{"categories:datapack"}
 	} else {
 		typeFacets = []string{"project_type:mod"}
 		// Mod usually means Fabric or Forge (handled by caller passing "categories:fabric" in basic facets?
@@ -135,6 +137,8 @@ func (s *ModrinthService) InstallProject(serverID string, projectID string, proj
 		// Let's add them all to match broadly.
 		loaders = append(loaders, "bukkit", "spigot", "paper", "purpur")
 		// Ideally we match the server software but plugins are generally cross-compatible on these platforms.
+	} else if projectType == "datapack" {
+		loaders = append(loaders, "datapack")
 	} else {
 		// Mods
 		if server.Type == core.TypeFabric {
@@ -209,13 +213,30 @@ func (s *ModrinthService) InstallProject(serverID string, projectID string, proj
 	}
 
 	// 6. Download
-	// Determine folder based on type
-	folderName := "mods"
-	if projectType == "plugin" {
-		folderName = "plugins"
+	var targetDir string
+
+	if projectType == "datapack" {
+		props, err := s.serverService.GetProperties(serverID)
+		if err != nil {
+			// If properties missing, maybe default or error?
+			// Let's default to "world" if we can't read props or fail.
+			// But user said "doit lire la propriété level-name".
+			// If GetProperties fails (e.g. server not set up), returning error is safer.
+			return fmt.Errorf("cannot read server.properties for datapack install: %w", err)
+		}
+
+		levelName := props["level-name"]
+		if levelName == "" {
+			levelName = "world"
+		}
+		targetDir = filepath.Join(s.serverService.GetDataDir(), serverID, levelName, "datapacks")
+	} else if projectType == "plugin" {
+		targetDir = filepath.Join(s.serverService.GetDataDir(), serverID, "plugins")
+	} else {
+		// mods
+		targetDir = filepath.Join(s.serverService.GetDataDir(), serverID, "mods")
 	}
 
-	targetDir := filepath.Join(s.serverService.GetDataDir(), serverID, folderName)
 	if err := os.MkdirAll(targetDir, 0755); err != nil {
 		return err
 	}

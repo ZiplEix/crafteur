@@ -17,7 +17,7 @@
 
     export let serverId: string;
     export let installedAddons: AddonFile[] = [];
-    export let searchType: "mod" | "plugin" = "mod";
+    export let searchType: "mod" | "plugin" | "datapack" = "mod";
 
     let query = "";
     let loading = false;
@@ -126,7 +126,9 @@
             on:input={handleInput}
             placeholder={searchType === "mod"
                 ? "Search for a mod (e.g., JEI, Sodium, Create...)"
-                : "Search for a plugin (e.g., Essentials, WorldEdit...)"}
+                : searchType === "plugin"
+                  ? "Search for a plugin (e.g., Essentials, WorldEdit...)" // Added placeholder for plugin and datapack
+                  : "Search for a datapack (e.g., Terralith, Incendium...)"}
             class="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-lg leading-5 bg-gray-900/50 text-gray-300 placeholder-gray-500 focus:outline-none focus:bg-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
         />
     </div>
@@ -140,6 +142,8 @@
             {#if searchType === "mod"}
                 Auto-filter applied: Compatibility checked with your server
                 version and type.
+            {:else if searchType === "datapack"}
+                Filtre appliqué : Datapacks (Vanilla)
             {:else}
                 Auto-filter applied: Compatible Spigot/Paper/Bukkit plugins.
             {/if}
