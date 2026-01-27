@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+    --color-slate-950: #020617;
+}
+
+@layer base {
+    body {
+        @apply bg-slate-950 text-slate-50 font-sans antialiased;
+    }
+}
