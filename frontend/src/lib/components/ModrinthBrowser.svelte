@@ -13,15 +13,37 @@
         ModrinthProject,
         ModrinthSearchResponse,
     } from "$lib/types/modrinth";
+    import type { AddonFile } from "$lib/types/addons";
 
     export let serverId: string;
+    export let installedAddons: AddonFile[] = [];
 
     let query = "";
     let loading = false;
     let hits: ModrinthProject[] = [];
     let debounceTimer: any;
     let installing: Record<string, boolean> = {};
-    let installed: Record<string, boolean> = {}; // Track session-installed items
+    let sessionInstalled: Record<string, boolean> = {}; // Track session-installed items
+
+    // Helper to check if a project is installed (heuristic or session)
+    function isInstalled(project: ModrinthProject): boolean {
+        // 1. Check session cache (immediate feedback after install)
+        if (sessionInstalled[project.project_id]) return true;
+
+        // 2. Check existing files (heuristic: filename contains slug)
+        // This is not 100% accurate but covers most cases like "sodium-mc1.20.jar" containing "sodium"
+        // We normalize to lowercase for better matching
+        const slug = project.slug.toLowerCase();
+        const titlePart = project.title.toLowerCase().split(" ")[0]; // First word of title, e.g "Fabric" from "Fabric API"
+
+        return installedAddons.some((file) => {
+            const name = file.name.toLowerCase();
+            return (
+                name.includes(slug) ||
+                (titlePart.length > 3 && name.includes(titlePart))
+            );
+        });
+    }
 
     async function search() {
         loading = true;
@@ -58,7 +80,7 @@
                 serverId: serverId,
                 projectId: project.project_id,
             });
-            installed[project.project_id] = true;
+            sessionInstalled[project.project_id] = true;
             // Maybe show a toast via a global store or event?
             // For now relies on button state change
         } catch (e: any) {
@@ -190,7 +212,7 @@
                             Modrinth
                         </a>
 
-                        {#if installed[project.project_id]}
+                        {#if isInstalled(project)}
                             <button
                                 disabled
                                 class="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-gray-700 text-gray-400 cursor-not-allowed"

@@ -305,6 +305,6 @@
             {/if}
         </div>
     {:else if viewMode === "catalog" && activeTab === "mods"}
-        <ModrinthBrowser {serverId} />
+        <ModrinthBrowser {serverId} installedAddons={files} />
     {/if}
 </div>
