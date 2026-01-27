@@ -79,3 +79,20 @@ sudo systemctl restart crafteur
 <Alert type="info" title="Conseil">
   Si vous utilisez un pare-feu (ufw), n'oubliez pas d'autoriser le port choisi : <code>sudo ufw allow 8080</code>.
 </Alert>
+
+## Désinstallation
+
+Si vous souhaitez retirer Crafteur de votre serveur, nous fournissons un script automatisé qui nettoie le service et les fichiers binaires.
+
+```bash
+curl -sL https://raw.githubusercontent.com/ZiplEix/crafteur/main/uninstall.sh | sudo bash
+```
+
+Lors de l'exécution, le script vous demandera si vous souhaitez :
+
+- **Conserver vos données (Mondes, Backups, Configuration)** : Seul le logiciel est supprimé.
+- **Tout supprimer** : Le dossier `/opt/crafteur` est intégralement effacé.
+
+<Alert type="error" title="Attention">
+  Si vous choisissez de tout supprimer, cette action est irréversible. Pensez à télécharger vos backups via l'interface web (Onglet Save) avant de lancer cette commande.
+</Alert>
