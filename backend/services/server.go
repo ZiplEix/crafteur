@@ -16,13 +16,15 @@ type ServerService struct {
 	manager     *minecraft.Manager
 	vService    *VersionService
 	fileService *FileService
+	fabric      *FabricService
 }
 
-func NewServerService(m *minecraft.Manager, v *VersionService, f *FileService) *ServerService {
+func NewServerService(m *minecraft.Manager, v *VersionService, f *FileService, fab *FabricService) *ServerService {
 	return &ServerService{
 		manager:     m,
 		vService:    v,
 		fileService: f,
+		fabric:      fab,
 	}
 }
 
@@ -43,7 +45,7 @@ func (s *ServerService) LoadServersAtStartup() error {
 			continue
 		}
 
-		inst := s.manager.AddInstance(cfg.ID, runDir, "server.jar")
+		inst := s.manager.AddInstance(cfg.ID, runDir, cfg.JarName)
 		inst.SetRAM(cfg.RAM)
 
 		fmt.Printf(" -> Serveur chargé : %s (ID: %s)\n", cfg.Name, cfg.ID)
@@ -67,11 +69,22 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 		return nil, fmt.Errorf("création dossier impossible: %w", err)
 	}
 
-	// 3. Download
+	// 3. Download Vanilla JAR (Always required)
 	jarPath := filepath.Join(serverPath, "server.jar")
 	if err := core.DownloadFile(downloadUrl, jarPath); err != nil {
 		os.RemoveAll(serverPath)
-		return nil, fmt.Errorf("téléchargement échoué: %w", err)
+		return nil, fmt.Errorf("téléchargement server.jar échoué: %w", err)
+	}
+
+	jarName := "server.jar"
+	if sType == core.TypeFabric {
+		// Install Fabric
+		launchJar, err := s.fabric.InstallFabric(serverPath, version, "") // loader="" means latest
+		if err != nil {
+			os.RemoveAll(serverPath)
+			return nil, fmt.Errorf("fabric install failed: %w", err)
+		}
+		jarName = launchJar
 	}
 
 	// 3. EULA
@@ -116,6 +129,7 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 		RAM:         ram,
 		JavaVersion: 21,
 		Version:     version,
+		JarName:     jarName,
 	}
 
 	// 5. Persistance
@@ -125,7 +139,7 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 	}
 
 	// 6. Runtime
-	inst := s.manager.AddInstance(newID, serverPath, "server.jar")
+	inst := s.manager.AddInstance(newID, serverPath, cfg.JarName)
 	inst.SetRAM(ram)
 
 	return cfg, nil

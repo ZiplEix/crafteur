@@ -57,8 +57,11 @@ func main() {
 	// File Service assuming data is in "backend/data/servers" relative to running dir, or just "data/servers"
 	fileService := services.NewFileService(mcManager, "data/servers")
 
-	// Server Service now needs FileService
-	serverService := services.NewServerService(mcManager, versionService, fileService)
+	// Fabric Service
+	fabricService := services.NewFabricService()
+
+	// Server Service now needs FileService and FabricService
+	serverService := services.NewServerService(mcManager, versionService, fileService, fabricService)
 
 	if err := serverService.LoadServersAtStartup(); err != nil {
 		log.Fatal("Can't load servers at startup:", err)

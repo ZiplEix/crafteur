@@ -125,6 +125,32 @@
 
                 <div class="space-y-2">
                     <label
+                        for="type"
+                        class="block text-sm font-medium text-slate-300"
+                        >Type de serveur</label
+                    >
+                    <div class="space-y-2">
+                        <select
+                            id="type"
+                            bind:value={type}
+                            class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white outline-none transition-all"
+                        >
+                            <option value="vanilla">Vanilla</option>
+                            <option value="fabric">Fabric</option>
+                        </select>
+                        {#if type === "fabric"}
+                            <p
+                                class="text-xs text-blue-400 bg-blue-500/10 px-3 py-2 rounded-lg border border-blue-500/20"
+                            >
+                                L'installation Fabric inclura automatiquement le
+                                Loader le plus récent.
+                            </p>
+                        {/if}
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label
                         for="version"
                         class="block text-sm font-medium text-slate-300"
                         >Version Minecraft</label

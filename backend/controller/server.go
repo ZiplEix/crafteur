@@ -87,6 +87,8 @@ func (ctrl *ServerController) Create(c echo.Context) error {
 		sType = core.TypePaper
 	case string(core.TypeForge):
 		sType = core.TypeForge
+	case string(core.TypeFabric):
+		sType = core.TypeFabric
 	default:
 		// Default to Vanilla if invalid or empty, or handle error
 		if typeStr == "" {
