@@ -8,12 +8,23 @@ import (
 	"regexp"
 	"sync"
 
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/ZiplEix/crafteur/core"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 type WSMessage struct {
 	Type string `json:"type"`
-	Data string `json:"data"`
+	Data any    `json:"data"`
+}
+
+type ServerStats struct {
+	CpuUsage float64 `json:"cpu"`     // %
+	RamUsage uint64  `json:"ram"`     // Octets
+	RamMax   uint64  `json:"ram_max"` // Octets (Xmx)
 }
 
 type Instance struct {
@@ -99,6 +110,29 @@ func (i *Instance) IsPlayerOnline(name string) bool {
 	return i.ConnectedPlayers[name]
 }
 
+func (i *Instance) SetRAM(mb int) {
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
+	// Create formatted strings, e.g., "-Xmx1024M"
+	xmx := fmt.Sprintf("-Xmx%dM", mb)
+	xms := fmt.Sprintf("-Xms%dM", mb)
+
+	// Update JavaArgs
+	// We replace the default args or update existing ones
+	// For simplicity, we'll assuming we control the args and just overwrite the memory ones
+	// But to be safe, let's filter out old memory args and append new ones
+
+	newArgs := make([]string, 0, len(i.JavaArgs)+2)
+	for _, arg := range i.JavaArgs {
+		if !strings.HasPrefix(arg, "-Xmx") && !strings.HasPrefix(arg, "-Xms") {
+			newArgs = append(newArgs, arg)
+		}
+	}
+	newArgs = append(newArgs, xmx, xms)
+	i.JavaArgs = newArgs
+}
+
 var (
 	joinRegex  = regexp.MustCompile(`]: (\w+) joined the game`)
 	leaveRegex = regexp.MustCompile(`]: (\w+) left the game`)
@@ -142,6 +176,7 @@ func (i *Instance) Start() error {
 	i.broadcastLog("--- PROCESS START ---")
 
 	go i.monitorProcess(stdout)
+	go i.startMonitoring()
 
 	return nil
 }
@@ -248,4 +283,81 @@ func (i *Instance) broadcast(msg WSMessage) {
 		default:
 		}
 	}
+}
+
+func (i *Instance) startMonitoring() {
+	i.mu.Lock()
+	if i.cmd == nil || i.cmd.Process == nil {
+		i.mu.Unlock()
+		return
+	}
+	pid := int32(i.cmd.Process.Pid)
+	maxRam := i.parseMaxRam()
+	i.mu.Unlock()
+
+	proc, err := process.NewProcess(pid)
+	if err != nil {
+		return
+	}
+
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		if i.GetStatus() != core.StatusRunning {
+			return
+		}
+
+		select {
+		case <-ticker.C:
+			exists, _ := process.PidExists(pid)
+			if !exists {
+				return
+			}
+
+			cpu, _ := proc.Percent(0)
+			mem, err := proc.MemoryInfo()
+			var ramUsage uint64
+			if err == nil {
+				ramUsage = mem.RSS
+			}
+
+			stats := ServerStats{
+				CpuUsage: cpu,
+				RamUsage: ramUsage,
+				RamMax:   maxRam,
+			}
+
+			i.broadcast(WSMessage{Type: "stats", Data: stats})
+		}
+	}
+}
+
+func (i *Instance) parseMaxRam() uint64 {
+	for _, arg := range i.JavaArgs {
+		if strings.HasPrefix(arg, "-Xmx") {
+			return parseBytes(arg[4:])
+		}
+	}
+	// Default 1G if not specified
+	return 1024 * 1024 * 1024
+}
+
+func parseBytes(s string) uint64 {
+	s = strings.ToUpper(s)
+	var multiplier uint64 = 1
+
+	if strings.HasSuffix(s, "G") {
+		multiplier = 1024 * 1024 * 1024
+		s = strings.TrimSuffix(s, "G")
+	} else if strings.HasSuffix(s, "M") {
+		multiplier = 1024 * 1024
+		s = strings.TrimSuffix(s, "M")
+	} else if strings.HasSuffix(s, "K") {
+		multiplier = 1024
+		s = strings.TrimSuffix(s, "K")
+	}
+
+	val, _ := strconv.ParseUint(s, 10, 64)
+	return val * multiplier
 }

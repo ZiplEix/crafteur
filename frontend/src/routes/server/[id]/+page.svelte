@@ -15,6 +15,7 @@
         RotateCw,
     } from "lucide-svelte";
     import { configGroups } from "$lib/config_schema";
+    import type { ServerStats } from "$lib/types/server";
     import FileManager from "$lib/components/FileManager.svelte";
     import PlayerManager from "$lib/components/PlayerManager.svelte";
     import LogViewer from "$lib/components/LogViewer.svelte";
@@ -27,9 +28,11 @@
         type: string;
         port: number;
         status: string;
+        ram: number;
     }
 
     let server: ServerDetail | null = null;
+    let stats: ServerStats | null = null;
     let loading: boolean = true;
     let error: string | null = null;
 
@@ -158,6 +161,11 @@
                     }
                 } else if (msg.type === "status" && server) {
                     server.status = msg.data;
+                    if (server.status === "STOPPED") {
+                        stats = null;
+                    }
+                } else if (msg.type === "stats") {
+                    stats = msg.data;
                 }
             } catch (e) {
                 console.error("Failed to parse WS message", e);
@@ -185,6 +193,22 @@
     $: if (activeTab === "configuration") {
         fetchProperties();
     }
+
+    function formatBytes(bytes: number): string {
+        const gb = bytes / (1024 * 1024 * 1024);
+        return `${gb.toFixed(1)} GB`;
+    }
+
+    function getRamColor(ram: number, max: number): string {
+        const ratio = ram / max;
+        if (ratio < 0.75) return "#4ade80"; // green-400
+        if (ratio < 0.9) return "#facc15"; // yellow-400
+        return "#f87171"; // red-400
+    }
+
+    $: currentCpu = stats ? stats.cpu : 0;
+    $: currentRam = stats ? stats.ram : 0;
+    $: maxRam = stats ? stats.ram_max : server ? server.ram * 1024 * 1024 : 0;
 </script>
 
 <div class="container mx-auto p-6 max-w-7xl">
@@ -210,6 +234,59 @@
                     {server.status}
                 </span>
                 <span class="text-gray-400 text-sm">Port: {server.port}</span>
+
+                <div
+                    class="hidden md:flex items-center gap-6 ml-4 border-l border-gray-700 pl-6 h-10"
+                >
+                    <!-- CPU -->
+                    <div class="flex items-center gap-3">
+                        <div class="flex flex-col items-end">
+                            <span
+                                class="text-[10px] uppercase text-gray-500 font-bold tracking-wider leading-none mb-1"
+                                >CPU</span
+                            >
+                            <span
+                                class="text-white font-mono text-sm leading-none"
+                                >{currentCpu.toFixed(1)}%</span
+                            >
+                        </div>
+                    </div>
+
+                    <!-- RAM -->
+                    <div class="flex items-center gap-3">
+                        <div class="flex flex-col w-40">
+                            <div class="flex justify-between items-end mb-1.5">
+                                <span
+                                    class="text-[10px] uppercase text-gray-500 font-bold tracking-wider leading-none"
+                                    >RAM</span
+                                >
+                                <div
+                                    class="text-xs font-mono text-gray-300 leading-none"
+                                >
+                                    <span class="text-white"
+                                        >{formatBytes(currentRam)}</span
+                                    >
+                                    <span class="text-gray-600 mx-0.5">/</span>
+                                    <span class="text-gray-500"
+                                        >{formatBytes(maxRam)}</span
+                                    >
+                                </div>
+                            </div>
+                            <div
+                                class="h-1.5 bg-gray-800 rounded-full overflow-hidden"
+                            >
+                                <div
+                                    class="h-full rounded-full transition-all duration-500 ease-out"
+                                    style="width: {(currentRam / maxRam) *
+                                        100}%; background-color: {getRamColor(
+                                        currentRam,
+                                        maxRam,
+                                    )}"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="flex gap-2">

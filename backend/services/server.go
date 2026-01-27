@@ -39,6 +39,7 @@ func (s *ServerService) LoadServersAtStartup() error {
 		}
 
 		inst := s.manager.AddInstance(cfg.ID, runDir, "server.jar")
+		inst.SetRAM(cfg.RAM)
 
 		fmt.Printf(" -> Serveur chargé : %s (ID: %s)\n", cfg.Name, cfg.ID)
 		_ = inst
@@ -86,7 +87,8 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 	}
 
 	// 5. Runtime
-	s.manager.AddInstance(newID, serverPath, "server.jar")
+	inst := s.manager.AddInstance(newID, serverPath, "server.jar")
+	inst.SetRAM(ram)
 
 	return cfg, nil
 }
