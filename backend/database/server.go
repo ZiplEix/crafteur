@@ -3,7 +3,7 @@ package database
 import "github.com/ZiplEix/crafteur/core"
 
 func GetAllServers() ([]core.ServerConfig, error) {
-	rows, err := DB.Query("SELECT id, name, type, port, ram, java_version FROM servers")
+	rows, err := DB.Query("SELECT id, name, type, port, ram, java_version, version FROM servers")
 	if err != nil {
 		return nil, err
 	}
@@ -12,7 +12,7 @@ func GetAllServers() ([]core.ServerConfig, error) {
 	var servers []core.ServerConfig
 	for rows.Next() {
 		var s core.ServerConfig
-		if err := rows.Scan(&s.ID, &s.Name, &s.Type, &s.Port, &s.RAM, &s.JavaVersion); err != nil {
+		if err := rows.Scan(&s.ID, &s.Name, &s.Type, &s.Port, &s.RAM, &s.JavaVersion, &s.Version); err != nil {
 			return nil, err
 		}
 		servers = append(servers, s)
@@ -22,7 +22,7 @@ func GetAllServers() ([]core.ServerConfig, error) {
 
 func GetServer(id string) (*core.ServerConfig, error) {
 	var s core.ServerConfig
-	err := DB.QueryRow("SELECT id, name, type, port, ram, java_version FROM servers WHERE id = ?", id).Scan(&s.ID, &s.Name, &s.Type, &s.Port, &s.RAM, &s.JavaVersion)
+	err := DB.QueryRow("SELECT id, name, type, port, ram, java_version, version FROM servers WHERE id = ?", id).Scan(&s.ID, &s.Name, &s.Type, &s.Port, &s.RAM, &s.JavaVersion, &s.Version)
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +31,8 @@ func GetServer(id string) (*core.ServerConfig, error) {
 
 func CreateServer(s *core.ServerConfig) error {
 	_, err := DB.Exec(
-		"INSERT INTO servers (id, name, type, port, ram, java_version) VALUES (?, ?, ?, ?, ?, ?)",
-		s.ID, s.Name, s.Type, s.Port, s.RAM, s.JavaVersion,
+		"INSERT INTO servers (id, name, type, port, ram, java_version, version) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		s.ID, s.Name, s.Type, s.Port, s.RAM, s.JavaVersion, s.Version,
 	)
 	return err
 }

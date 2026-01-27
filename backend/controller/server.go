@@ -47,10 +47,11 @@ func (ctrl *ServerController) GetOne(c echo.Context) error {
 
 // POST /api/servers
 type CreateServerRequest struct {
-	Name string          `json:"name"`
-	Type core.ServerType `json:"type"`
-	Port int             `json:"port"`
-	RAM  int             `json:"ram"`
+	Name    string          `json:"name"`
+	Type    core.ServerType `json:"type"`
+	Port    int             `json:"port"`
+	RAM     int             `json:"ram"`
+	Version string          `json:"version"` // Added version field
 }
 
 func (ctrl *ServerController) Create(c echo.Context) error {
@@ -63,7 +64,11 @@ func (ctrl *ServerController) Create(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid port or insufficient RAM"})
 	}
 
-	newServer, err := ctrl.service.CreateNewServer(req.Name, req.Type, req.Port, req.RAM)
+	if req.Version == "" {
+		req.Version = "1.21.4" // Default if not provided
+	}
+
+	newServer, err := ctrl.service.CreateNewServer(req.Name, req.Type, req.Port, req.RAM, req.Version)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -156,4 +161,36 @@ func (ctrl *ServerController) UpdateProperties(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"status": "updated"})
+}
+
+// GET /api/meta/versions
+func (ctrl *ServerController) GetVersions(c echo.Context) error {
+	versions, err := ctrl.service.GetVersions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, versions)
+}
+
+// POST /api/servers/:id/version
+type ChangeVersionRequest struct {
+	Version string `json:"version"`
+}
+
+func (ctrl *ServerController) ChangeVersion(c echo.Context) error {
+	id := c.Param("id")
+	var req ChangeVersionRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
+	}
+
+	if req.Version == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Version required"})
+	}
+
+	if err := ctrl.service.ChangeServerVersion(id, req.Version); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"status": "version changed", "version": req.Version})
 }

@@ -52,7 +52,8 @@ func main() {
 	}
 
 	mcManager := minecraft.NewManager()
-	serverService := services.NewServerService(mcManager)
+	versionService := services.NewVersionService()
+	serverService := services.NewServerService(mcManager, versionService)
 
 	if err := serverService.LoadServersAtStartup(); err != nil {
 		log.Fatal("Can't load servers at startup:", err)

@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"sync"
 
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -316,6 +317,11 @@ func (i *Instance) startMonitoring() {
 			}
 
 			cpu, _ := proc.Percent(0)
+
+			// Normalize CPU usage by core count to output 0-100% representation of system share
+			// rather than total core accumulation (e.g. 800% on 8 cores)
+			cpuNormalized := cpu / float64(runtime.NumCPU())
+
 			mem, err := proc.MemoryInfo()
 			var ramUsage uint64
 			if err == nil {
@@ -323,7 +329,7 @@ func (i *Instance) startMonitoring() {
 			}
 
 			stats := ServerStats{
-				CpuUsage: cpu,
+				CpuUsage: cpuNormalized,
 				RamUsage: ramUsage,
 				RamMax:   maxRam,
 			}

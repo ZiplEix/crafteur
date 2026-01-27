@@ -23,6 +23,7 @@ type ServerConfig struct {
 	Port        int        `json:"port"`
 	RAM         int        `json:"ram"`
 	JavaVersion int        `json:"java_version"`
+	Version     string     `json:"version"` // Minecraft version (e.g. 1.20.4)
 }
 
 type User struct {
@@ -47,5 +48,6 @@ type ServerDetailResponse struct {
 	Port        int          `json:"port"`
 	RAM         int          `json:"ram"`
 	JavaVersion int          `json:"java_version"`
+	Version     string       `json:"version"`
 	Status      ServerStatus `json:"status"`
 }

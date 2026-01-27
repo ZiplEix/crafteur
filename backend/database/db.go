@@ -28,7 +28,8 @@ func InitDB() {
 		type TEXT,
 		port INTEGER,
 		ram INTEGER DEFAULT 2048,
-		java_version INTEGER DEFAULT 21
+		java_version INTEGER DEFAULT 21,
+		version TEXT
 	);
 	
 	CREATE TABLE IF NOT EXISTS users (

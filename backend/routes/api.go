@@ -36,6 +36,10 @@ func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *c
 	protected.GET("/servers/:id/properties", serverCtrl.GetProperties)
 	protected.POST("/servers/:id/properties", serverCtrl.UpdateProperties)
 
+	// Update endpoint
+	protected.GET("/meta/versions", serverCtrl.GetVersions)
+	protected.POST("/servers/:id/version", serverCtrl.ChangeVersion)
+
 	// Player Routes
 	protected.GET("/servers/:id/players/cache", playerCtrl.GetCache)
 	protected.GET("/servers/:id/players/ops", playerCtrl.GetOps)

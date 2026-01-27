@@ -1,7 +1,9 @@
 <script lang="ts">
     import { X } from "lucide-svelte";
     import { servers } from "$lib/stores";
+    import { versions, loadVersions } from "$lib/stores/meta";
     import { api } from "$lib/api";
+    import { onMount } from "svelte";
 
     interface Props {
         isOpen: boolean;
@@ -12,12 +14,16 @@
     let { isOpen, onClose, onServerCreated = () => {} }: Props = $props();
 
     $effect(() => {
+        if (isOpen) {
+            loadVersions();
+        }
         console.log("CreateServerModal: isOpen prop changed:", isOpen);
     });
 
     let name = $state("");
     let port = $state(25565);
     let ram = $state(2048);
+    let version = $state("1.21.4");
     let loading = $state(false);
 
     let error: string | null = $state(null);
@@ -33,6 +39,7 @@
                 type: "vanilla", // For now, only vanilla is supported
                 port: Number(port),
                 ram: Number(ram),
+                version,
             });
 
             const newServer = res.data;
@@ -105,6 +112,28 @@
                         class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white placeholder-slate-500 outline-none transition-all"
                         placeholder="Mon Serveur Survie"
                     />
+                </div>
+
+                <div class="space-y-2">
+                    <label
+                        for="version"
+                        class="block text-sm font-medium text-slate-300"
+                        >Version Minecraft</label
+                    >
+                    <select
+                        id="version"
+                        bind:value={version}
+                        class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white outline-none transition-all"
+                    >
+                        {#each $versions as v}
+                            <option value={v.id}
+                                >{v.id}
+                                {v.type !== "release"
+                                    ? `(${v.type})`
+                                    : ""}</option
+                            >
+                        {/each}
+                    </select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">

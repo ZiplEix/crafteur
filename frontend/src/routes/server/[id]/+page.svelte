@@ -16,6 +16,7 @@
     } from "lucide-svelte";
     import { configGroups } from "$lib/config_schema";
     import type { ServerStats } from "$lib/types/server";
+    import { versions, loadVersions } from "$lib/stores/meta";
     import FileManager from "$lib/components/FileManager.svelte";
     import PlayerManager from "$lib/components/PlayerManager.svelte";
     import LogViewer from "$lib/components/LogViewer.svelte";
@@ -192,6 +193,43 @@
 
     $: if (activeTab === "configuration") {
         fetchProperties();
+        loadVersions();
+    }
+
+    let changingVersion = false;
+    let selectedVersion = "";
+
+    async function changeVersion() {
+        if (!selectedVersion || selectedVersion === server?.version) return;
+
+        if (
+            !confirm(
+                `ATTENTION: Changer de version pour la ${selectedVersion} peut corrompre votre monde si vous downgradez.\nIl est fortement recommandé de faire une sauvegarde avant.\n\nVoulez-vous continuer ?`,
+            )
+        ) {
+            return;
+        }
+
+        changingVersion = true;
+        try {
+            await api.post(`/api/servers/${serverId}/version`, {
+                version: selectedVersion,
+            });
+            alert(
+                `Version changée vers ${selectedVersion}. Le serveur redémarre...`,
+            );
+            // Reload server details
+            fetchServer();
+            selectedVersion = "";
+        } catch (e: any) {
+            console.error("Failed to change version", e);
+            alert(
+                "Erreur lors du changement de version: " +
+                    (e.response?.data?.error || e.message),
+            );
+        } finally {
+            changingVersion = false;
+        }
     }
 
     function formatBytes(bytes: number): string {
@@ -397,6 +435,63 @@
                 </div>
             {:else if activeTab === "configuration"}
                 <div class="space-y-8">
+                    <!-- Version Management -->
+                    <div
+                        class="bg-slate-800/50 p-6 rounded-xl border border-gray-700"
+                    >
+                        <h3
+                            class="text-xl font-semibold text-white mb-4 flex items-center gap-2"
+                        >
+                            <RotateCw size={20} class="text-blue-400" />
+                            Version du Serveur
+                        </h3>
+                        <div class="flex flex-col md:flex-row gap-4 items-end">
+                            <div class="flex-1 space-y-2 w-full">
+                                <label
+                                    for="serverVersion"
+                                    class="text-sm font-medium text-gray-400"
+                                    >Version Actuelle: <span
+                                        class="text-white font-bold"
+                                        >{server.version || "Inconnue"}</span
+                                    ></label
+                                >
+                                <select
+                                    id="serverVersion"
+                                    bind:value={selectedVersion}
+                                    class="w-full bg-slate-900 border border-gray-600 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                >
+                                    <option value="" disabled selected
+                                        >Choisir une nouvelle version...</option
+                                    >
+                                    {#each $versions as v}
+                                        <option value={v.id}
+                                            >{v.id}
+                                            {v.type !== "release"
+                                                ? `(${v.type})`
+                                                : ""}</option
+                                        >
+                                    {/each}
+                                </select>
+                            </div>
+                            <button
+                                on:click={changeVersion}
+                                disabled={!selectedVersion ||
+                                    changingVersion ||
+                                    selectedVersion === server.version}
+                                class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2"
+                            >
+                                {#if changingVersion}
+                                    <div
+                                        class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
+                                    ></div>
+                                    Installation...
+                                {:else}
+                                    Changer la version
+                                {/if}
+                            </button>
+                        </div>
+                    </div>
+
                     {#each configGroups as group}
                         <div>
                             <h3

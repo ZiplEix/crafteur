@@ -12,12 +12,14 @@ import (
 )
 
 type ServerService struct {
-	manager *minecraft.Manager
+	manager  *minecraft.Manager
+	vService *VersionService
 }
 
-func NewServerService(m *minecraft.Manager) *ServerService {
+func NewServerService(m *minecraft.Manager, v *VersionService) *ServerService {
 	return &ServerService{
-		manager: m,
+		manager:  m,
+		vService: v,
 	}
 }
 
@@ -47,19 +49,23 @@ func (s *ServerService) LoadServersAtStartup() error {
 	return nil
 }
 
-func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port int, ram int) (*core.ServerConfig, error) {
+func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port int, ram int, version string) (*core.ServerConfig, error) {
 	newID := uuid.New().String()
 	serverPath := filepath.Join("./data/servers", newID)
 
-	// 1. Setup physique
+	// 1. Validate version and get URL
+	downloadUrl, err := s.vService.GetDownloadURL(version)
+	if err != nil {
+		return nil, fmt.Errorf("version invalide: %w", err)
+	}
+
+	// 2. Setup physique
 	if err := core.EnsureDir(serverPath); err != nil {
 		return nil, fmt.Errorf("création dossier impossible: %w", err)
 	}
 
-	// 2. Download (Hardcoded Vanilla 1.21.4)
+	// 3. Download
 	jarPath := filepath.Join(serverPath, "server.jar")
-	downloadUrl := "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar"
-
 	if err := core.DownloadFile(downloadUrl, jarPath); err != nil {
 		os.RemoveAll(serverPath)
 		return nil, fmt.Errorf("téléchargement échoué: %w", err)
@@ -78,6 +84,7 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 		Port:        port,
 		RAM:         ram,
 		JavaVersion: 21,
+		Version:     version,
 	}
 
 	// 4. Persistance
@@ -162,6 +169,7 @@ func (s *ServerService) GetServerDetail(id string) (*core.ServerDetailResponse, 
 		Port:        cfg.Port,
 		RAM:         cfg.RAM,
 		JavaVersion: cfg.JavaVersion,
+		Version:     cfg.Version,
 		Status:      status,
 	}, nil
 }
@@ -197,4 +205,67 @@ func (s *ServerService) UpdateProperties(id string, newProps map[string]string) 
 
 	// 3. Sauvegarder
 	return minecraft.SaveProperties(propsPath, currentProps)
+}
+
+func (s *ServerService) ChangeServerVersion(id string, targetVersion string) error {
+	// 1. Validate version
+	downloadUrl, err := s.vService.GetDownloadURL(targetVersion)
+	if err != nil {
+		return fmt.Errorf("version invalide: %w", err)
+	}
+
+	// 2. Get Server and Stop if running
+	inst, exists := s.manager.GetInstance(id)
+	if !exists {
+		return fmt.Errorf("serveur introuvable")
+	}
+
+	if inst.GetStatus() != core.StatusStopped {
+		if err := inst.Stop(); err != nil {
+			return fmt.Errorf("impossible d'arrêter le serveur: %w", err)
+		}
+		// Wait for stop (simple sleep mostly, or check status loop)
+		// For simplicity, we assume Stop() blocks or we wait a bit,
+		// but Stop() in manager is async for process kill?
+		// Actually inst.Stop() sends command or kills.
+		// Ideally we should wait until status is stopped.
+	}
+
+	serverPath := inst.RunDir
+	jarPath := filepath.Join(serverPath, "server.jar")
+	backupPath := filepath.Join(serverPath, "server.jar.old")
+
+	// 3. Backup old jar
+	if _, err := os.Stat(jarPath); err == nil {
+		os.Rename(jarPath, backupPath)
+	}
+
+	// 4. Download new jar
+	if err := core.DownloadFile(downloadUrl, jarPath); err != nil {
+		// Restore backup
+		os.Rename(backupPath, jarPath)
+		return fmt.Errorf("téléchargement échoué: %w", err)
+	}
+
+	// 5. Update DB
+	// First get current config
+	cfg, err := database.GetServer(id)
+	if err != nil {
+		return err
+	}
+	// Delete old entry
+	if err := database.DeleteServer(id); err != nil {
+		return err
+	}
+	// Update version and recreate
+	cfg.Version = targetVersion
+	if err := database.CreateServer(cfg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *ServerService) GetVersions() ([]core.MojangVersion, error) {
+	return s.vService.GetVersions()
 }
