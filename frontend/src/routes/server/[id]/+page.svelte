@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy, tick, type Component } from "svelte";
     import { page } from "$app/stores";
+    import { goto } from "$app/navigation";
     import { api } from "$lib/api";
     import {
         Terminal,
@@ -45,7 +46,57 @@
     let error: string | null = null;
     let showDeleteModal = false;
 
+    // Valid tabs for security/consistency
+    const VALID_TABS = [
+        "console",
+        "log",
+        "schedule",
+        "save",
+        "file",
+        "world",
+        "addons",
+        "configuration",
+        "player",
+    ];
+
     let activeTab: string = "console";
+
+    // Update activeTab based on URL
+    $: {
+        const tab = $page.url.searchParams.get("tab");
+        if (tab && VALID_TABS.includes(tab)) {
+            activeTab = tab;
+        } else if (!tab && activeTab !== "console") {
+            // If no tab in URL, default to console (only if we're not already there/initializing)
+            // Actually, the requirement says: "Récupère le param au chargement"
+            // Svelte reactive statement will run whenever $page.url changes.
+            // If URL has no tab, we can default to console.
+            // But we want to preserve manual changes if they haven't synced to URL yet?
+            // No, changeTab syncs URL. So URL is source of truth.
+        }
+    }
+
+    // Reactive initialization requested by user: $: activeTab = $page.url.searchParams.get('tab') || 'console';
+    // But we need validation.
+    $: {
+        const t = $page.url.searchParams.get("tab");
+        if (t && VALID_TABS.includes(t)) {
+            activeTab = t;
+        }
+    }
+
+    function changeTab(tab: string) {
+        activeTab = tab; // Immediate visual update
+        const newUrl = new URL($page.url);
+        newUrl.searchParams.set("tab", tab);
+
+        goto(newUrl.toString(), {
+            replaceState: true,
+            keepFocus: true,
+            noScroll: true,
+        });
+    }
+
     let logs: string[] = [];
     let commandInput: string = "";
     let properties: Record<string, string> = {};
@@ -375,7 +426,7 @@
             <div class="flex gap-2">
                 {#each tabs as tab}
                     <button
-                        on:click={() => (activeTab = tab.id)}
+                        on:click={() => changeTab(tab.id)}
                         class="flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer
                         {activeTab === tab.id
                             ? 'border-green-500 text-white'
