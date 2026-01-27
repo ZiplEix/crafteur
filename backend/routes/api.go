@@ -26,7 +26,10 @@ func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *c
 
 	protected.GET("/servers", serverCtrl.Index)
 	protected.GET("/servers/:id", serverCtrl.GetOne)
+	protected.GET("/servers", serverCtrl.Index)
+	protected.GET("/servers/:id", serverCtrl.GetOne)
 	protected.POST("/servers", serverCtrl.Create)
+	protected.DELETE("/servers/:id", serverCtrl.Delete)
 
 	protected.POST("/servers/:id/start", serverCtrl.Start)
 	protected.POST("/servers/:id/stop", serverCtrl.Stop)

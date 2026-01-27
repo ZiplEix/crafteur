@@ -71,3 +71,8 @@ func UpdateLastRun(id string, lastRun time.Time) error {
 	_, err := DB.Exec(`UPDATE scheduled_tasks SET last_run = ? WHERE id = ?`, lastRun, id)
 	return err
 }
+
+func DeleteTasksByServer(serverID string) error {
+	_, err := DB.Exec(`DELETE FROM scheduled_tasks WHERE server_id = ?`, serverID)
+	return err
+}

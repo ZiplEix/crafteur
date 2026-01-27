@@ -300,3 +300,42 @@ func (s *ServerService) ChangeServerVersion(id string, targetVersion string) err
 func (s *ServerService) GetVersions() ([]core.MojangVersion, error) {
 	return s.vService.GetVersions()
 }
+
+func (s *ServerService) DeleteServer(id string) error {
+	// 0. Stop memory instance
+	inst, exists := s.manager.GetInstance(id)
+	if exists {
+		// Stop if running (blocking or async? usually best effort)
+		if inst.GetStatus() != core.StatusStopped {
+			_ = inst.Stop()
+		}
+		s.manager.RemoveInstance(id)
+	}
+
+	// 1. Remove Files (Data)
+	serverPath := filepath.Join("./data/servers", id)
+	if err := os.RemoveAll(serverPath); err != nil {
+		return fmt.Errorf("failed to delete server files: %w", err)
+	}
+
+	// 2. Remove Backups (Optional but requested)
+	backupPath := filepath.Join("./data/backups", id)
+	if err := os.RemoveAll(backupPath); err != nil {
+		// Log but don't fail hard? Or fail?
+		// Let's return error to be safe, or just log fmt.Printf like LoadServers?
+		// Ideally we want to be clean.
+		return fmt.Errorf("failed to delete backups: %w", err)
+	}
+
+	// 3. Remove Tasks
+	if err := database.DeleteTasksByServer(id); err != nil {
+		return fmt.Errorf("failed to delete scheduled tasks: %w", err)
+	}
+
+	// 4. Remove DB Entry
+	if err := database.DeleteServer(id); err != nil {
+		return fmt.Errorf("failed to delete server from db: %w", err)
+	}
+
+	return nil
+}

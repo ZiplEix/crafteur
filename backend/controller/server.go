@@ -231,3 +231,12 @@ func (ctrl *ServerController) ChangeVersion(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"status": "version changed", "version": req.Version})
 }
+
+// DELETE /api/servers/:id
+func (ctrl *ServerController) Delete(c echo.Context) error {
+	id := c.Param("id")
+	if err := ctrl.service.DeleteServer(id); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.NoContent(http.StatusNoContent)
+}

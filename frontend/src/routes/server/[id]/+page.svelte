@@ -24,6 +24,8 @@
     import BackupManager from "$lib/components/BackupManager.svelte";
     import ScheduleManager from "$lib/components/ScheduleManager.svelte";
     import WorldManager from "$lib/components/WorldManager.svelte";
+    import DeleteConfirmationModal from "$lib/components/DeleteConfirmationModal.svelte";
+    import { AlertTriangle } from "lucide-svelte";
 
     interface ServerDetail {
         id: string;
@@ -40,6 +42,7 @@
     let stats: ServerStats | null = null;
     let loading: boolean = true;
     let error: string | null = null;
+    let showDeleteModal = false;
 
     let activeTab: string = "console";
     let logs: string[] = [];
@@ -592,6 +595,33 @@
                             Sauvegarder la configuration
                         </button>
                     </div>
+
+                    <!-- Danger Zone -->
+                    <div class="mt-12 pt-8 border-t border-red-900/50">
+                        <div
+                            class="bg-red-950/10 border border-red-900/50 rounded-xl p-6 flex flex-col md:flex-row justify-between items-center gap-4"
+                        >
+                            <div>
+                                <h3
+                                    class="text-xl font-bold text-red-500 mb-1 flex items-center gap-2"
+                                >
+                                    <AlertTriangle size={20} />
+                                    Zone de Danger
+                                </h3>
+                                <p class="text-red-400/80 text-sm max-w-xl">
+                                    Supprimer ce serveur est irréversible.
+                                    Toutes les données, mondes et configurations
+                                    seront définitivement perdus.
+                                </p>
+                            </div>
+                            <button
+                                on:click={() => (showDeleteModal = true)}
+                                class="bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/50 hover:border-red-600 px-6 py-2.5 rounded-lg font-bold transition-all whitespace-nowrap"
+                            >
+                                Supprimer le serveur
+                            </button>
+                        </div>
+                    </div>
                 </div>
             {:else if activeTab === "schedule"}
                 <ScheduleManager serverId={server.id} />
@@ -611,5 +641,14 @@
                 </div>
             {/if}
         </div>
+    {/if}
+
+    {#if server}
+        <DeleteConfirmationModal
+            isOpen={showDeleteModal}
+            serverId={server.id}
+            serverName={server.name}
+            onClose={() => (showDeleteModal = false)}
+        />
     {/if}
 </div>
