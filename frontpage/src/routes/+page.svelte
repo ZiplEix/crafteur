@@ -15,6 +15,7 @@
         Users,
         Zap,
         Calendar,
+        ChevronLeft,
     } from "lucide-svelte";
 
     let copied = $state(false);
@@ -100,12 +101,61 @@
             color: "text-purple-400",
         },
     ];
+
+    // Carousel Logic
+    let currentSlide = $state(0);
+    const screens = [
+        {
+            title: "Dashboard",
+            src: "/mockup/mockup_dashboard_panel.png",
+        },
+        {
+            title: "Console",
+            src: "/mockup/mockup_console.png",
+        },
+        {
+            title: "Schedules",
+            src: "/mockup/mockup_schedule.png",
+        },
+        {
+            title: "Backups",
+            src: "/mockup/mockup_backup.png",
+        },
+        {
+            title: "Files",
+            src: "/mockup/mockup_save.png",
+        },
+        {
+            title: "Worlds",
+            src: "/mockup/mockup_world.png",
+        },
+        {
+            title: "Add-ons",
+            src: "/mockup/mockup_addson.png",
+        },
+        {
+            title: "Configuration",
+            src: "/mockup/mockup_configuration.png",
+        },
+        {
+            title: "Players",
+            src: "/mockup/mockup_player.png",
+        },
+    ];
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % screens.length;
+    }
+
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + screens.length) % screens.length;
+    }
 </script>
 
 <div class="relative isolate overflow-hidden">
     <!-- Background effects -->
     <div
-        class="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.slate.900),theme(colors.slate.950))] opacity-20"
+        class="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,var(--color-slate-900),var(--color-slate-950))] opacity-20"
     ></div>
     <div
         class="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-slate-950 shadow-xl shadow-slate-900/10 ring-1 ring-slate-900 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center"
@@ -117,7 +167,7 @@
                 class="text-4xl font-bold tracking-tight text-white sm:text-6xl"
             >
                 Gérez vos serveurs <span
-                    class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500"
+                    class="bg-clip-text text-transparent bg-linear-to-r from-green-400 to-blue-500"
                     >simplement</span
                 >
             </h1>
@@ -151,15 +201,54 @@
                 class="-m-2 rounded-xl bg-slate-900/50 ring-1 ring-inset ring-slate-900/10 lg:-m-4 lg:rounded-2xl lg:p-4 perspective-1000"
             >
                 <div
-                    class="relative rounded-xl bg-slate-800 shadow-2xl ring-1 ring-slate-900/10 aspect-video flex items-center justify-center transform hover:scale-[1.02] transition-transform duration-500"
+                    class="relative rounded-xl bg-slate-800 shadow-2xl ring-1 ring-slate-900/10 aspect-video flex items-center justify-center transform hover:scale-[1.02] transition-transform duration-500 overflow-hidden group"
                     style="transform: rotateX(5deg);"
                 >
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent rounded-xl pointer-events-none"
-                    ></div>
-                    <!-- Mockup Content -->
-                    <div class="text-slate-500 font-medium">
-                        Dashboard Interface Placeholder
+                    <!-- Carousel Slide -->
+                    {#each screens as screen, i}
+                        <div
+                            class="absolute inset-0 transition-opacity duration-500 flex items-center justify-center bg-slate-900"
+                            class:opacity-100={currentSlide === i}
+                            class:opacity-0={currentSlide !== i}
+                        >
+                            <img
+                                src={screen.src}
+                                alt={screen.title}
+                                class="w-full h-full object-contain"
+                            />
+
+                            <!-- Overlay Gradient -->
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-slate-950/20 to-transparent pointer-events-none"
+                            ></div>
+                        </div>
+                    {/each}
+
+                    <!-- Controls -->
+                    <button
+                        onclick={prevSlide}
+                        class="absolute left-4 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 hover:cursor-pointer"
+                    >
+                        <ChevronLeft class="w-6 h-6" />
+                    </button>
+                    <button
+                        onclick={nextSlide}
+                        class="absolute right-4 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 hover:cursor-pointer"
+                    >
+                        <ChevronRight class="w-6 h-6" />
+                    </button>
+
+                    <!-- Indicators -->
+                    <div class="absolute bottom-4 flex gap-2">
+                        {#each screens as _, i}
+                            <button
+                                onclick={() => (currentSlide = i)}
+                                class="w-2 h-2 rounded-full transition-all hover:cursor-pointer {currentSlide ===
+                                i
+                                    ? 'bg-white w-4'
+                                    : 'bg-white/50 hover:bg-white/80'}"
+                            ></button>
+                        {/each}
                     </div>
                 </div>
             </div>
