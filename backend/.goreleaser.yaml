@@ -19,9 +19,6 @@ builds:
 
     binary: crafteur
 
-    flags:
-      - -s -w
-
 archives:
   - formats: binary
 
