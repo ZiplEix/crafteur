@@ -137,6 +137,7 @@
                         >
                             <option value="vanilla">Vanilla</option>
                             <option value="fabric">Fabric</option>
+                            <option value="paper">Paper (Plugins)</option>
                         </select>
                         {#if type === "fabric"}
                             <p
@@ -144,6 +145,14 @@
                             >
                                 L'installation Fabric inclura automatiquement le
                                 Loader le plus récent.
+                            </p>
+                        {:else if type === "paper"}
+                            <p
+                                class="text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg border border-amber-500/20"
+                            >
+                                Recommandé pour les serveurs publics. Supporte
+                                les plugins Spigot/Bukkit. Ne supporte pas les
+                                mods Fabric/Forge.
                             </p>
                         {/if}
                     </div>

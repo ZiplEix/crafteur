@@ -59,9 +59,11 @@ func main() {
 
 	// Fabric Service
 	fabricService := services.NewFabricService()
+	// Paper Service
+	paperService := services.NewPaperService()
 
-	// Server Service now needs FileService and FabricService
-	serverService := services.NewServerService(mcManager, versionService, fileService, fabricService)
+	// Server Service now needs FileService, FabricService and PaperService
+	serverService := services.NewServerService(mcManager, versionService, fileService, fabricService, paperService)
 
 	if err := serverService.LoadServersAtStartup(); err != nil {
 		log.Fatal("Can't load servers at startup:", err)

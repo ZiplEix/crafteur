@@ -17,14 +17,16 @@ type ServerService struct {
 	vService    *VersionService
 	fileService *FileService
 	fabric      *FabricService
+	paper       *PaperService
 }
 
-func NewServerService(m *minecraft.Manager, v *VersionService, f *FileService, fab *FabricService) *ServerService {
+func NewServerService(m *minecraft.Manager, v *VersionService, f *FileService, fab *FabricService, pap *PaperService) *ServerService {
 	return &ServerService{
 		manager:     m,
 		vService:    v,
 		fileService: f,
 		fabric:      fab,
+		paper:       pap,
 	}
 }
 
@@ -85,6 +87,14 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 			return nil, fmt.Errorf("fabric install failed: %w", err)
 		}
 		jarName = launchJar
+	} else if sType == core.TypePaper {
+		// Install Paper
+		paperJar, err := s.paper.InstallPaper(serverPath, version)
+		if err != nil {
+			os.RemoveAll(serverPath)
+			return nil, fmt.Errorf("paper install failed: %w", err)
+		}
+		jarName = paperJar
 	}
 
 	// 3. EULA
