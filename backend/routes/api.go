@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *controller.FileController, playerCtrl *controller.PlayerController, logCtrl *controller.LogController, backupCtrl *controller.BackupController, schedulerCtrl *controller.SchedulerController, worldCtrl *controller.WorldController, addonCtrl *controller.AddonController) {
+func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *controller.FileController, playerCtrl *controller.PlayerController, logCtrl *controller.LogController, backupCtrl *controller.BackupController, schedulerCtrl *controller.SchedulerController, worldCtrl *controller.WorldController, addonCtrl *controller.AddonController, modrinthCtrl *controller.ModrinthController) {
 	api := e.Group("/api")
 
 	// Public Routes
@@ -81,4 +81,7 @@ func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *c
 	protected.GET("/servers/:id/addons/:type", addonCtrl.Index)
 	protected.POST("/servers/:id/addons/:type", addonCtrl.Upload)
 	protected.DELETE("/servers/:id/addons/:type/:filename", addonCtrl.Delete)
+	// Modrinth Routes
+	protected.GET("/modrinth/search", modrinthCtrl.Search)
+	protected.POST("/modrinth/install", modrinthCtrl.Install)
 }

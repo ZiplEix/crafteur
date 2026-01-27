@@ -353,3 +353,11 @@ func (s *ServerService) DeleteServer(id string) error {
 
 	return nil
 }
+
+func (s *ServerService) GetServer(id string) (*core.ServerConfig, error) {
+	return database.GetServer(id)
+}
+
+func (s *ServerService) GetDataDir() string {
+	return "./data/servers"
+}

@@ -72,6 +72,7 @@ func main() {
 	schedulerService := services.NewSchedulerService(serverService)
 	worldService := services.NewWorldService(serverService, "data/servers")
 	addonService := services.NewAddonService(serverService, "data/servers")
+	modrinthService := services.NewModrinthService(serverService)
 
 	serverCtrl := controller.NewServerController(serverService)
 	fileCtrl := controller.NewFileController(fileService)
@@ -81,6 +82,7 @@ func main() {
 	schedulerCtrl := controller.NewSchedulerController(schedulerService)
 	worldCtrl := controller.NewWorldController(worldService)
 	addonCtrl := controller.NewAddonController(addonService)
+	modrinthCtrl := controller.NewModrinthController(modrinthService, serverService)
 
 	e := echo.New()
 
@@ -101,7 +103,7 @@ func main() {
 		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 
-	routes.Register(e, serverCtrl, fileCtrl, playerCtrl, logCtrl, backupCtrl, schedulerCtrl, worldCtrl, addonCtrl)
+	routes.Register(e, serverCtrl, fileCtrl, playerCtrl, logCtrl, backupCtrl, schedulerCtrl, worldCtrl, addonCtrl, modrinthCtrl)
 
 	assetHandler := http.FileServer(getFileSystem())
 	e.GET("/*", echo.WrapHandler(assetHandler))
