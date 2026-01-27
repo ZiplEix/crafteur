@@ -30,20 +30,33 @@ fi
 mkdir -p /opt/crafteur/data
 chown -R crafteur:crafteur /opt/crafteur
 
+# 2.5 Détection Architecture
+ARCH=$(uname -m)
+case $ARCH in
+    x86_64)
+        BINARY_SUFFIX="linux_amd64"
+        ;;
+    aarch64)
+        BINARY_SUFFIX="linux_arm64"
+        ;;
+    *)
+        echo "❌ Architecture non supportée : $ARCH"
+        exit 1
+        ;;
+esac
+
 # 3. Installation Binaire
-echo -e "${GREEN}Installation du binaire...${NC}"
-# Simulation : on s'attend à ce que le binaire soit dans le dossier courant ou téléchargé
-if [ -f "crafteur-bin" ]; then
-    cp crafteur-bin /opt/crafteur/crafteur
-elif [ -f "backend/crafteur-bin" ]; then
-    cp backend/crafteur-bin /opt/crafteur/crafteur
-elif [ -f "crafteur" ]; then
-    cp crafteur /opt/crafteur/crafteur
-else
-    echo -e "${RED}Binaire 'crafteur' ou 'crafteur-bin' introuvable dans le dossier courant.${NC}"
-    # Ici on pourrait ajouter une logique de téléchargement curl
+echo -e "${GREEN}Recherche de la dernière version pour $BINARY_SUFFIX...${NC}"
+
+DOWNLOAD_URL=$(curl -sL https://api.github.com/repos/ZiplEix/crafteur/releases/latest | grep "browser_download_url" | grep "$BINARY_SUFFIX" | cut -d '"' -f 4)
+
+if [ -z "$DOWNLOAD_URL" ]; then
+    echo -e "${RED}Impossible de trouver le binaire pour $BINARY_SUFFIX dans la dernière release.${NC}"
     exit 1
 fi
+
+echo -e "${GREEN}Téléchargement depuis $DOWNLOAD_URL...${NC}"
+curl -L -o /opt/crafteur/crafteur "$DOWNLOAD_URL"
 chmod +x /opt/crafteur/crafteur
 chown crafteur:crafteur /opt/crafteur/crafteur
 
