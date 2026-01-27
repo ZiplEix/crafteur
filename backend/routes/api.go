@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *controller.FileController, playerCtrl *controller.PlayerController, logCtrl *controller.LogController, backupCtrl *controller.BackupController, schedulerCtrl *controller.SchedulerController, worldCtrl *controller.WorldController) {
+func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *controller.FileController, playerCtrl *controller.PlayerController, logCtrl *controller.LogController, backupCtrl *controller.BackupController, schedulerCtrl *controller.SchedulerController, worldCtrl *controller.WorldController, addonCtrl *controller.AddonController) {
 	api := e.Group("/api")
 
 	// Public Routes
@@ -76,4 +76,9 @@ func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *c
 	protected.POST("/servers/:id/worlds", worldCtrl.CreateWorld)
 	protected.POST("/servers/:id/worlds/:name/activate", worldCtrl.ActivateWorld)
 	protected.DELETE("/servers/:id/worlds/:name", worldCtrl.DeleteWorld)
+
+	// Addon Routes
+	protected.GET("/servers/:id/addons/:type", addonCtrl.Index)
+	protected.POST("/servers/:id/addons/:type", addonCtrl.Upload)
+	protected.DELETE("/servers/:id/addons/:type/:filename", addonCtrl.Delete)
 }

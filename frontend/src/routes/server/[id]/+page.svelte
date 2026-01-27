@@ -24,8 +24,9 @@
     import BackupManager from "$lib/components/BackupManager.svelte";
     import ScheduleManager from "$lib/components/ScheduleManager.svelte";
     import WorldManager from "$lib/components/WorldManager.svelte";
+    import AddonManager from "$lib/components/AddonManager.svelte";
     import DeleteConfirmationModal from "$lib/components/DeleteConfirmationModal.svelte";
-    import { AlertTriangle } from "lucide-svelte";
+    import { AlertTriangle, Puzzle } from "lucide-svelte";
 
     interface ServerDetail {
         id: string;
@@ -61,6 +62,7 @@
         { id: "save", label: "Backups", icon: Save },
         { id: "file", label: "File", icon: Folder },
         { id: "world", label: "Worlds", icon: Globe },
+        { id: "addons", label: "Add-ons", icon: Puzzle },
         { id: "configuration", label: "Configuration", icon: Settings },
         { id: "player", label: "Player", icon: Users },
     ];
@@ -629,6 +631,10 @@
                 <BackupManager serverId={server.id} />
             {:else if activeTab === "world"}
                 <WorldManager serverId={server.id} />
+            {:else if activeTab === "world"}
+                <WorldManager serverId={server.id} />
+            {:else if activeTab === "addons"}
+                <AddonManager serverId={server.id} />
             {:else}
                 <div
                     class="flex flex-col items-center justify-center h-64 text-gray-400"
