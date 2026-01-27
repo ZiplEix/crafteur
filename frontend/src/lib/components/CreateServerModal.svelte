@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { X } from "lucide-svelte";
+    import { X, Upload } from "lucide-svelte";
     import { servers } from "$lib/stores";
     import { versions, loadVersions } from "$lib/stores/meta";
     import { api } from "$lib/api";
-    import { onMount } from "svelte";
 
     interface Props {
         isOpen: boolean;
@@ -17,13 +16,14 @@
         if (isOpen) {
             loadVersions();
         }
-        console.log("CreateServerModal: isOpen prop changed:", isOpen);
     });
 
     let name = $state("");
     let port = $state(25565);
     let ram = $state(2048);
     let version = $state("1.21.4");
+    let type = $state("vanilla");
+    let importFiles: FileList | null = $state(null);
     let loading = $state(false);
 
     let error: string | null = $state(null);
@@ -34,13 +34,21 @@
         error = null;
 
         try {
-            const res = await api.post("/api/servers", {
-                name,
-                type: "vanilla", // For now, only vanilla is supported
-                port: Number(port),
-                ram: Number(ram),
-                version,
-            });
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("port", port.toString());
+            formData.append("ram", ram.toString());
+            formData.append("type", type);
+            formData.append("version", version);
+
+            if (importFiles && importFiles.length > 0) {
+                formData.append("import", importFiles[0]);
+            }
+
+            // We use axios (via api wrapper) which might try to set Content-Type if simply passed an object.
+            // But usually passing FormData lets the browser set Content-Type with boundary.
+            // checking api wrapper implementation is not possible right now but standard axios handles FormData correctly.
+            const res = await api.post("/api/servers", formData);
 
             const newServer = res.data;
 
@@ -51,6 +59,7 @@
             name = "";
             port = 25565;
             ram = 2048;
+            importFiles = null;
 
             onServerCreated();
             onClose();
@@ -136,6 +145,34 @@
                     </select>
                 </div>
 
+                <div class="space-y-2">
+                    <label
+                        for="import"
+                        class="block text-sm font-medium text-slate-300"
+                        >Importer des données (Optionnel)</label
+                    >
+                    <div class="relative">
+                        <input
+                            type="file"
+                            id="import"
+                            accept=".zip"
+                            bind:files={importFiles}
+                            class="hidden"
+                        />
+                        <label
+                            for="import"
+                            class="flex items-center justify-center w-full px-3 py-2 bg-slate-900 border border-dashed border-slate-600 rounded-lg cursor-pointer hover:border-green-500 hover:text-green-500 text-slate-400 transition-all gap-2"
+                        >
+                            <Upload size={16} />
+                            <span class="truncate">
+                                {importFiles && importFiles.length > 0
+                                    ? importFiles[0].name
+                                    : "Sélectionner un fichier .zip"}
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label
@@ -176,7 +213,9 @@
                             <div
                                 class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
                             ></div>
-                            Création...
+                            {importFiles && importFiles.length > 0
+                                ? "Création et Import..."
+                                : "Création..."}
                         {:else}
                             Créer le serveur
                         {/if}

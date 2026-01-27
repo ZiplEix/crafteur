@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"mime/multipart"
 	"os"
 	"path/filepath"
 
@@ -12,14 +13,16 @@ import (
 )
 
 type ServerService struct {
-	manager  *minecraft.Manager
-	vService *VersionService
+	manager     *minecraft.Manager
+	vService    *VersionService
+	fileService *FileService
 }
 
-func NewServerService(m *minecraft.Manager, v *VersionService) *ServerService {
+func NewServerService(m *minecraft.Manager, v *VersionService, f *FileService) *ServerService {
 	return &ServerService{
-		manager:  m,
-		vService: v,
+		manager:     m,
+		vService:    v,
+		fileService: f,
 	}
 }
 
@@ -49,7 +52,7 @@ func (s *ServerService) LoadServersAtStartup() error {
 	return nil
 }
 
-func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port int, ram int, version string) (*core.ServerConfig, error) {
+func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port int, ram int, version string, importFile *multipart.FileHeader) (*core.ServerConfig, error) {
 	newID := uuid.New().String()
 	serverPath := filepath.Join("./data/servers", newID)
 
@@ -77,6 +80,34 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 		return nil, fmt.Errorf("eula creation failed: %w", err)
 	}
 
+	// 4. Import zip if provided
+	if importFile != nil {
+		// We use FileService logic but we are inside the service so we can call it directly.
+		// However, FileService expects to work with serverID for security check logic resolving paths.
+		// Since we have the ID and the path is structured correctly, we can use it.
+		// Be careful: FileService resolves paths relative to dataDir + serverID.
+		// Our s.fileService is initialized with dataDir="data/servers" (from main.go likely).
+		// serverPath is "./data/servers/<id>".
+		// Let's use FileService.UploadFile first to put the zip there, then Unzip.
+
+		// Actually, FileService.UploadFile takes targetPath relative to server root.
+		// So targetPath="" puts it in root.
+		if err := s.fileService.UploadFile(newID, "", importFile); err != nil {
+			os.RemoveAll(serverPath)
+			return nil, fmt.Errorf("upload import error: %w", err)
+		}
+
+		// Now unzip
+		if err := s.fileService.Unzip(newID, "", importFile.Filename); err != nil {
+			os.RemoveAll(serverPath)
+			return nil, fmt.Errorf("unzip import error: %w", err)
+		}
+
+		// Cleanup zip
+		zipPath := filepath.Join(serverPath, importFile.Filename)
+		_ = os.Remove(zipPath)
+	}
+
 	cfg := &core.ServerConfig{
 		ID:          newID,
 		Name:        name,
@@ -87,13 +118,13 @@ func (s *ServerService) CreateNewServer(name string, sType core.ServerType, port
 		Version:     version,
 	}
 
-	// 4. Persistance
+	// 5. Persistance
 	if err := database.CreateServer(cfg); err != nil {
 		os.RemoveAll(serverPath)
 		return nil, err
 	}
 
-	// 5. Runtime
+	// 6. Runtime
 	inst := s.manager.AddInstance(newID, serverPath, "server.jar")
 	inst.SetRAM(ram)
 

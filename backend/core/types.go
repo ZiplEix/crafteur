@@ -14,6 +14,8 @@ type ServerType string
 const (
 	TypeVanilla ServerType = "vanilla"
 	TypeFabric  ServerType = "fabric"
+	TypePaper   ServerType = "paper"
+	TypeForge   ServerType = "forge"
 )
 
 type ServerConfig struct {

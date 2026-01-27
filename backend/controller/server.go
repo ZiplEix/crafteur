@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/ZiplEix/crafteur/core"
 	"github.com/ZiplEix/crafteur/minecraft"
@@ -55,20 +56,56 @@ type CreateServerRequest struct {
 }
 
 func (ctrl *ServerController) Create(c echo.Context) error {
-	var req CreateServerRequest
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
+	// Parse Multipart Form
+	if err := c.Request().ParseMultipartForm(32 << 20); err != nil { // 32MB max mem
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Failed to parse multipart form"})
 	}
 
-	if req.Port < 1024 || req.RAM < 512 {
+	name := c.FormValue("name")
+	portStr := c.FormValue("port")
+	ramStr := c.FormValue("ram")
+	typeStr := c.FormValue("type")
+	version := c.FormValue("version")
+
+	port, _ := strconv.Atoi(portStr)
+	ram, _ := strconv.Atoi(ramStr)
+
+	if port < 1024 || ram < 512 {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid port or insufficient RAM"})
 	}
 
-	if req.Version == "" {
-		req.Version = "1.21.4" // Default if not provided
+	if version == "" {
+		version = "1.21.4"
 	}
 
-	newServer, err := ctrl.service.CreateNewServer(req.Name, req.Type, req.Port, req.RAM, req.Version)
+	// Validate Type
+	var sType core.ServerType
+	switch typeStr {
+	case string(core.TypeVanilla):
+		sType = core.TypeVanilla
+	case string(core.TypePaper):
+		sType = core.TypePaper
+	case string(core.TypeForge):
+		sType = core.TypeForge
+	default:
+		// Default to Vanilla if invalid or empty, or handle error
+		if typeStr == "" {
+			sType = core.TypeVanilla
+		} else {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid server type"})
+		}
+	}
+
+	// Get file
+	file, err := c.FormFile("import")
+	// If err is not nil, it means no file or error. If http.ErrMissingFile, it's just no file, which is allowed.
+	if err != nil && err != http.ErrMissingFile {
+		// Real error
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "File upload error"})
+	}
+	// If err == http.ErrMissingFile, file is nil, which is fine.
+
+	newServer, err := ctrl.service.CreateNewServer(name, sType, port, ram, version, file)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

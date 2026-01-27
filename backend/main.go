@@ -53,17 +53,16 @@ func main() {
 
 	mcManager := minecraft.NewManager()
 	versionService := services.NewVersionService()
-	serverService := services.NewServerService(mcManager, versionService)
+
+	// File Service assuming data is in "backend/data/servers" relative to running dir, or just "data/servers"
+	fileService := services.NewFileService(mcManager, "data/servers")
+
+	// Server Service now needs FileService
+	serverService := services.NewServerService(mcManager, versionService, fileService)
 
 	if err := serverService.LoadServersAtStartup(); err != nil {
 		log.Fatal("Can't load servers at startup:", err)
 	}
-
-	// File Service assuming data is in "backend/data/servers" relative to running dir, or just "data/servers"
-	// Based on instance.go NewInstance, RunDir seems to be passed by manager.
-	// The Manager likely knows the root. Let's assume data root is "./data/servers" for now or extraction from manager if possible.
-	// Looking at previous ls output: backend/data/servers exists.
-	fileService := services.NewFileService(mcManager, "data/servers")
 	playerService := services.NewPlayerService(mcManager, "data")
 	logService := services.NewLogService("data/servers")
 	backupService := services.NewBackupService("data/servers", "data/backups")
