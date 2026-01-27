@@ -50,7 +50,9 @@
             </a>
 
             <a
-                href="#download"
+                href="https://github.com/ZiplEix/crafteur/releases"
+                target="_blank"
+                rel="noreferrer"
                 class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-900/20 hover:bg-green-500 hover:shadow-green-900/40 transition-all focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-slate-900"
             >
                 <Download class="h-4 w-4" />

@@ -23,7 +23,7 @@ Pour installer et exécuter Crafteur, vous avez besoin de :
 La commande d'installation rapide exécute un script bash qui automatise le déploiement :
 
 ```bash
-curl -sL https://get.crafteur.fr | sudo bash
+curl -sL get.crafteur.fr | sudo bash
 ```
 
 ### Actions effectuées par le script
