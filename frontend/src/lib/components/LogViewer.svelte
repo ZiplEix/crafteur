@@ -70,7 +70,7 @@
             }
         } catch (e: any) {
             console.error("Failed to fetch logs", e);
-            errorList = "Impossible de charger la liste des logs";
+            errorList = "Failed to load log list";
         } finally {
             loadingList = false;
         }
@@ -92,7 +92,7 @@
             rawContent = res.data;
         } catch (e: any) {
             console.error("Failed to load log content", e);
-            errorContent = "Impossible de lire le fichier";
+            errorContent = "Failed to read file";
         } finally {
             loadingContent = false;
         }
@@ -123,7 +123,7 @@
         <div
             class="p-4 border-b border-gray-800 flex justify-between items-center"
         >
-            <h3 class="font-semibold text-gray-200">Fichiers</h3>
+            <h3 class="font-semibold text-gray-200">Files</h3>
             <button
                 onclick={fetchLogs}
                 class="text-gray-400 hover:text-white transition-colors cursor-pointer"
@@ -141,7 +141,7 @@
         >
             {#if loadingList}
                 <div class="p-4 text-center text-gray-500 text-sm">
-                    Chargement...
+                    Loading...
                 </div>
             {:else if errorList}
                 <div class="p-4 text-center text-red-400 text-sm">
@@ -149,7 +149,7 @@
                 </div>
             {:else if logs.length === 0}
                 <div class="p-4 text-center text-gray-500 text-sm">
-                    Aucun log trouvé
+                    No logs found
                 </div>
             {:else}
                 {#each logs as log}
@@ -193,7 +193,7 @@
                 <input
                     type="text"
                     bind:value={searchQuery}
-                    placeholder="Rechercher..."
+                    placeholder="Search..."
                     class="w-full bg-gray-900 border {regexError
                         ? 'border-red-500'
                         : 'border-gray-800'} rounded-lg pl-9 pr-3 py-1.5 text-sm text-gray-200 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-gray-600"
@@ -221,7 +221,7 @@
                         bind:checked={ignoreCase}
                         class="rounded bg-gray-800 border-gray-700 text-blue-600 focus:ring-offset-gray-900"
                     />
-                    Ignorer la casse
+                    Ignore case
                 </label>
             </div>
         </div>
@@ -241,7 +241,7 @@
                     <div
                         class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"
                     ></div>
-                    <span>Chargement du contenu...</span>
+                    <span>Loading content...</span>
                 </div>
             {:else if errorContent}
                 <div
@@ -255,13 +255,13 @@
                     class="flex flex-col items-center justify-center h-full text-gray-600 gap-2"
                 >
                     <FileText size={48} class="opacity-20" />
-                    <span>Sélectionnez un fichier pour voir son contenu</span>
+                    <span>Select a file to view its content</span>
                 </div>
             {:else if filteredLines.length === 0}
                 <div
                     class="flex flex-col items-center justify-center h-full text-gray-500 italic"
                 >
-                    Aucun résultat pour la recherche
+                    No matching results
                 </div>
             {:else}
                 {#each filteredLines as line}
@@ -290,7 +290,7 @@
             >
                 <span>{selectedFile}</span>
                 <span
-                    >{filteredLines.length} ligne{filteredLines.length > 1
+                    >{filteredLines.length} line{filteredLines.length > 1
                         ? "s"
                         : ""}</span
                 >

@@ -69,7 +69,7 @@
             } else if (err instanceof Error) {
                 error = err.message;
             } else {
-                error = "Une erreur inconnue est survenue";
+                error = "An unknown error occurred";
             }
         } finally {
             loading = false;
@@ -88,7 +88,7 @@
             <div
                 class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-900/50"
             >
-                <h2 class="text-xl font-bold text-white">Nouveau Serveur</h2>
+                <h2 class="text-xl font-bold text-white">New Server</h2>
                 <button
                     onclick={onClose}
                     class="text-slate-400 hover:text-white transition-colors cursor-pointer"
@@ -111,7 +111,7 @@
                     <label
                         for="name"
                         class="block text-sm font-medium text-slate-300"
-                        >Nom du serveur</label
+                        >Server Name</label
                     >
                     <input
                         type="text"
@@ -119,7 +119,7 @@
                         bind:value={name}
                         required
                         class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white placeholder-slate-500 outline-none transition-all"
-                        placeholder="Mon Serveur Survie"
+                        placeholder="My Survival Server"
                     />
                 </div>
 
@@ -127,7 +127,7 @@
                     <label
                         for="type"
                         class="block text-sm font-medium text-slate-300"
-                        >Type de serveur</label
+                        >Server Type</label
                     >
                     <div class="space-y-2">
                         <select
@@ -143,16 +143,16 @@
                             <p
                                 class="text-xs text-blue-400 bg-blue-500/10 px-3 py-2 rounded-lg border border-blue-500/20"
                             >
-                                L'installation Fabric inclura automatiquement le
-                                Loader le plus récent.
+                                Fabric installation will automatically include
+                                the latest Loader.
                             </p>
                         {:else if type === "paper"}
                             <p
                                 class="text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-lg border border-amber-500/20"
                             >
-                                Recommandé pour les serveurs publics. Supporte
-                                les plugins Spigot/Bukkit. Ne supporte pas les
-                                mods Fabric/Forge.
+                                Recommended for public servers. Supports
+                                Spigot/Bukkit plugins. Does not support
+                                Fabric/Forge mods.
                             </p>
                         {/if}
                     </div>
@@ -162,7 +162,7 @@
                     <label
                         for="version"
                         class="block text-sm font-medium text-slate-300"
-                        >Version Minecraft</label
+                        >Minecraft Version</label
                     >
                     <select
                         id="version"
@@ -184,7 +184,7 @@
                     <label
                         for="import"
                         class="block text-sm font-medium text-slate-300"
-                        >Importer des données (Optionnel)</label
+                        >Import Data (Optional)</label
                     >
                     <div class="relative">
                         <input
@@ -202,7 +202,7 @@
                             <span class="truncate">
                                 {importFiles && importFiles.length > 0
                                     ? importFiles[0].name
-                                    : "Sélectionner un fichier .zip"}
+                                    : "Select a .zip file"}
                             </span>
                         </label>
                     </div>
@@ -249,10 +249,10 @@
                                 class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
                             ></div>
                             {importFiles && importFiles.length > 0
-                                ? "Création et Import..."
-                                : "Création..."}
+                                ? "Creating & Importing..."
+                                : "Creating..."}
                         {:else}
-                            Créer le serveur
+                            Create Server
                         {/if}
                     </button>
                 </div>

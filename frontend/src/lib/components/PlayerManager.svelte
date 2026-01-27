@@ -59,7 +59,7 @@
             bans = bansRes.data;
         } catch (e) {
             console.error("Failed to load player data", e);
-            error = "Impossible de charger les données des joueurs.";
+            error = "Failed to load player data.";
         } finally {
             isLoading = false;
         }
@@ -82,7 +82,7 @@
             );
 
             // Show success toast
-            successMessage = `Action '${action}' effectuée avec succès pour ${player}.`;
+            successMessage = `Action '${action}' performed successfully for ${player}.`;
             setTimeout(() => (successMessage = null), 3000);
 
             // Refetch after 1 second
@@ -92,7 +92,7 @@
         } catch (e: any) {
             console.error(`Failed to execute ${action}`, e);
             error =
-                e.response?.data?.error || `Erreur lors de l'action ${action}`;
+                e.response?.data?.error || `Error performing action ${action}`;
             setTimeout(() => (error = null), 5000);
         }
     }
@@ -149,12 +149,12 @@
             >
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">
-                        Sanctionner {targetPlayer}
+                        Punish {targetPlayer}
                     </h3>
                     <button
                         onclick={closeSanctionModal}
                         class="text-gray-400 hover:text-white cursor-pointer"
-                        aria-label="Fermer"
+                        aria-label="Close"
                     >
                         <X size={24} />
                     </button>
@@ -163,7 +163,7 @@
                     <label
                         for="reason"
                         class="block text-sm font-medium text-slate-300 mb-2"
-                        >Raison (Optionnel)</label
+                        >Reason (Optional)</label
                     >
                     <input
                         type="text"
@@ -178,13 +178,13 @@
                         onclick={closeSanctionModal}
                         class="px-4 py-2 rounded bg-slate-700 text-white hover:bg-slate-600 transition-colors cursor-pointer"
                     >
-                        Annuler
+                        Cancel
                     </button>
                     <button
                         onclick={confirmSanction}
                         class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors font-medium cursor-pointer"
                     >
-                        Confirmer
+                        Confirm
                     </button>
                 </div>
             </div>
@@ -199,12 +199,12 @@
             <h2
                 class="text-xl font-bold mb-4 text-slate-200 border-b border-slate-700 pb-2"
             >
-                Historique
+                History
             </h2>
             <div class="overflow-y-auto flex-1 pr-2 space-y-2">
                 {#if cache.length === 0}
                     <p class="text-gray-500 italic text-center mt-4">
-                        Aucun joueur dans le cache.
+                        No players in cache.
                     </p>
                 {/if}
                 {#each cache as entry}
@@ -218,7 +218,7 @@
                                 {#if entry.online}
                                     <div
                                         class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"
-                                        title="En ligne"
+                                        title="Online"
                                     ></div>
                                 {/if}
                                 <p class="font-medium text-slate-200">
@@ -235,7 +235,7 @@
                             <button
                                 onclick={() => handleAction(entry.name, "op")}
                                 class="p-1.5 text-green-400 hover:bg-green-400/10 rounded transition-colors cursor-pointer"
-                                title="Promouvoir OP"
+                                title="Promote to OP"
                             >
                                 <Shield size={18} />
                             </button>
@@ -243,7 +243,7 @@
                                 onclick={() =>
                                     openSanctionModal(entry.name, "kick")}
                                 class="p-1.5 text-orange-400 hover:bg-orange-400/10 rounded transition-colors cursor-pointer"
-                                title="Ejecter (Kick)"
+                                title="Kick"
                             >
                                 <DoorOpen size={18} />
                             </button>
@@ -251,7 +251,7 @@
                                 onclick={() =>
                                     openSanctionModal(entry.name, "ban")}
                                 class="p-1.5 text-red-400 hover:bg-red-400/10 rounded transition-colors cursor-pointer"
-                                title="Bannir"
+                                title="Ban"
                             >
                                 <Ban size={18} />
                             </button>
@@ -268,12 +268,12 @@
             <h2
                 class="text-xl font-bold mb-4 text-slate-200 border-b border-slate-700 pb-2"
             >
-                Opérateurs
+                Operators
             </h2>
             <div class="overflow-y-auto flex-1 pr-2 space-y-2">
                 {#if ops.length === 0}
                     <p class="text-gray-500 italic text-center mt-4">
-                        Aucun opérateur.
+                        No operators.
                     </p>
                 {/if}
                 {#each ops as entry}
@@ -288,13 +288,13 @@
                                 </p>
                             </div>
                             <p class="text-xs text-slate-500">
-                                Niveau: {entry.level}
+                                Level: {entry.level}
                             </p>
                         </div>
                         <button
                             onclick={() => handleAction(entry.name, "deop")}
                             class="p-1.5 text-orange-400 hover:bg-orange-400/10 rounded transition-colors cursor-pointer"
-                            title="Retirer OP"
+                            title="Deop"
                         >
                             <ShieldX size={18} />
                         </button>
@@ -310,12 +310,12 @@
             <h2
                 class="text-xl font-bold mb-4 text-slate-200 border-b border-slate-700 pb-2"
             >
-                Bannis
+                Banned
             </h2>
             <div class="overflow-y-auto flex-1 pr-2 space-y-2">
                 {#if bans.length === 0}
                     <p class="text-gray-500 italic text-center mt-4">
-                        Aucun joueur banni.
+                        No banned players.
                     </p>
                 {/if}
                 {#each bans as entry}
@@ -332,13 +332,13 @@
                                 "{entry.reason}"
                             </p>
                             <p class="text-xs text-slate-500">
-                                Par: {entry.source}
+                                By: {entry.source}
                             </p>
                         </div>
                         <button
                             onclick={() => handleAction(entry.name, "pardon")}
                             class="p-1.5 text-blue-400 hover:bg-blue-400/10 rounded transition-colors cursor-pointer"
-                            title="Débannir (Pardon)"
+                            title="Pardon"
                         >
                             <Undo size={18} />
                         </button>

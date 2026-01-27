@@ -18,7 +18,7 @@
             if (e.response && e.response.data && e.response.data.error) {
                 error = e.response.data.error;
             } else {
-                error = "Erreur de connexion au serveur";
+                error = "Connection to server failed";
             }
         }
     }
@@ -28,9 +28,7 @@
     <div
         class="w-full max-w-md rounded-xl bg-slate-800 p-8 shadow-2xl border border-slate-700"
     >
-        <h1 class="mb-6 text-center text-3xl font-bold text-white">
-            Connexion
-        </h1>
+        <h1 class="mb-6 text-center text-3xl font-bold text-white">Login</h1>
 
         {#if error}
             <div
@@ -45,14 +43,14 @@
                 <label
                     for="username"
                     class="mb-2 block text-sm font-medium text-slate-300"
-                    >Nom d'utilisateur</label
+                    >Username</label
                 >
                 <input
                     type="text"
                     id="username"
                     bind:value={username}
                     class="w-full rounded-lg bg-slate-900 border border-slate-700 p-3 text-white placeholder-slate-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition-colors"
-                    placeholder="Votre nom d'utilisateur"
+                    placeholder="Your username"
                     required
                 />
             </div>
@@ -61,7 +59,7 @@
                 <label
                     for="password"
                     class="mb-2 block text-sm font-medium text-slate-300"
-                    >Mot de passe</label
+                    >Password</label
                 >
                 <input
                     type="password"
@@ -77,7 +75,7 @@
                 type="submit"
                 class="w-full rounded-lg bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-colors cursor-pointer"
             >
-                Se connecter
+                Login
             </button>
         </form>
     </div>

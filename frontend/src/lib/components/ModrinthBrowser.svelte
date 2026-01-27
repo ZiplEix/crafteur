@@ -89,7 +89,7 @@
         } catch (e: any) {
             console.error("Install failed", e);
             alert(
-                "Erreur d'installation : " +
+                "Installation failed: " +
                     (e.response?.data?.error || e.message),
             );
         } finally {
@@ -125,8 +125,8 @@
             bind:value={query}
             on:input={handleInput}
             placeholder={searchType === "mod"
-                ? "Rechercher un mod (ex: JEI, Sodium, Create...)"
-                : "Rechercher un plugin (ex: Essentials, WorldEdit...)"}
+                ? "Search for a mod (e.g., JEI, Sodium, Create...)"
+                : "Search for a plugin (e.g., Essentials, WorldEdit...)"}
             class="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-lg leading-5 bg-gray-900/50 text-gray-300 placeholder-gray-500 focus:outline-none focus:bg-gray-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
         />
     </div>
@@ -138,11 +138,10 @@
         <Info size={16} />
         <span>
             {#if searchType === "mod"}
-                Filtre automatique appliqué : Compatibilité vérifiée avec la
-                version et le type de votre serveur.
+                Auto-filter applied: Compatibility checked with your server
+                version and type.
             {:else}
-                Filtre automatique appliqué : Plugins compatibles
-                Spigot/Paper/Bukkit.
+                Auto-filter applied: Compatible Spigot/Paper/Bukkit plugins.
             {/if}
         </span>
     </div>
@@ -228,7 +227,7 @@
                                 class="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-gray-700 text-gray-400 cursor-not-allowed"
                             >
                                 <Check size={14} />
-                                Installé
+                                Installed
                             </button>
                         {:else}
                             <button
@@ -238,10 +237,10 @@
                             >
                                 {#if installing[project.project_id]}
                                     <Loader2 size={14} class="animate-spin" />
-                                    Installation...
+                                    Installing...
                                 {:else}
                                     <Download size={14} />
-                                    Installer
+                                    Install
                                 {/if}
                             </button>
                         {/if}

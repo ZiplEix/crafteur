@@ -83,7 +83,7 @@
             files = res.data;
         } catch (e: any) {
             console.error("Failed to load addons", e);
-            error = "Impossible de charger les extensions.";
+            error = "Failed to load addons.";
         } finally {
             loading = false;
         }
@@ -113,14 +113,11 @@
                 },
             );
 
-            alert(`${formFiles.length} fichiers ajoutés avec succès !`);
+            alert(`${formFiles.length} files added successfully!`);
             await loadAddons();
         } catch (e: any) {
             console.error("Upload failed", e);
-            alert(
-                "Erreur lors de l'upload: " +
-                    (e.response?.data?.error || e.message),
-            );
+            alert("Upload failed: " + (e.response?.data?.error || e.message));
         } finally {
             uploading = false;
             // Reset input
@@ -129,7 +126,7 @@
     }
 
     async function deleteAddon(filename: string) {
-        if (!confirm(`Voulez-vous vraiment supprimer ${filename} ?`)) {
+        if (!confirm(`Are you sure you want to delete ${filename}?`)) {
             return;
         }
 
@@ -140,10 +137,7 @@
             await loadAddons();
         } catch (e: any) {
             console.error("Delete failed", e);
-            alert(
-                "Erreur lors de la suppression: " +
-                    (e.response?.data?.error || e.message),
-            );
+            alert("Delete failed: " + (e.response?.data?.error || e.message));
         }
     }
 
@@ -208,7 +202,7 @@
                             : 'text-gray-400 hover:text-gray-200'}"
                     >
                         <HardDrive size={14} />
-                        Installés
+                        Installed
                     </button>
                     <button
                         on:click={() => switchView("catalog")}
@@ -218,7 +212,7 @@
                             : 'text-gray-400 hover:text-gray-200'}"
                     >
                         <Search size={14} />
-                        Catalogue
+                        Catalog
                     </button>
                 </div>
             {/if}
@@ -233,10 +227,10 @@
                 >
                     {#if uploading}
                         <Loader2 size={18} class="animate-spin" />
-                        Upload en cours...
+                        Uploading...
                     {:else}
                         <Upload size={18} />
-                        Ajouter des fichiers
+                        Add files
                     {/if}
                 </button>
                 <input
@@ -262,7 +256,7 @@
                     class="flex flex-col items-center justify-center h-64 text-gray-400 gap-3"
                 >
                     <Loader2 size={32} class="animate-spin text-blue-500" />
-                    <span>Chargement des fichiers...</span>
+                    <span>Loading files...</span>
                 </div>
             {:else if error}
                 <div class="flex items-center justify-center h-64 text-red-400">
@@ -281,10 +275,10 @@
                         />
                     </div>
                     <p>
-                        Aucun {availableTabs
+                        No {availableTabs
                             .find((t) => t.id === activeTab)
                             ?.label.toLowerCase()
-                            .slice(0, -1)} installé.
+                            .slice(0, -1)} installed.
                     </p>
                 </div>
             {:else}
@@ -294,11 +288,9 @@
                             <tr
                                 class="bg-gray-800/30 text-gray-400 text-xs uppercase border-b border-gray-800"
                             >
-                                <th class="p-4 font-medium">Nom</th>
-                                <th class="p-4 font-medium">Taille</th>
-                                <th class="p-4 font-medium"
-                                    >Date de modification</th
-                                >
+                                <th class="p-4 font-medium">Name</th>
+                                <th class="p-4 font-medium">Size</th>
+                                <th class="p-4 font-medium">Date Modified</th>
                                 <th class="p-4 font-medium text-right"
                                     >Actions</th
                                 >
@@ -331,7 +323,7 @@
                                             on:click={() =>
                                                 deleteAddon(file.name)}
                                             class="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
-                                            title="Supprimer"
+                                            title="Delete"
                                         >
                                             <Trash2 size={18} />
                                         </button>

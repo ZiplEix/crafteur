@@ -26,7 +26,7 @@
             backups = res.data;
         } catch (e: any) {
             console.error("Failed to fetch backups", e);
-            error = "Impossible de charger les sauvegardes";
+            error = "Failed to load backups";
         } finally {
             loading = false;
         }
@@ -38,26 +38,20 @@
         error = null;
         try {
             await api.post(`/api/servers/${serverId}/backups`);
-            alert("Sauvegarde créée avec succès !");
+            alert("Backup created successfully!");
             await fetchBackups();
         } catch (e: any) {
             const ae = e as AxiosError;
             console.error("Failed to create backup", e);
             const data = ae.response?.data as any;
-            alert(
-                `Erreur lors de la création de la sauvegarde: ${data?.error || e.message}`,
-            );
+            alert(`Error creating backup: ${data?.error || e.message}`);
         } finally {
             isCreating = false;
         }
     }
 
     async function deleteBackup(filename: string) {
-        if (
-            !confirm(
-                `Voulez-vous vraiment supprimer la sauvegarde ${filename} ?`,
-            )
-        )
+        if (!confirm(`Are you sure you want to delete backup ${filename}?`))
             return;
 
         try {
@@ -67,7 +61,7 @@
             const ae = e as AxiosError;
             console.error("Failed to delete backup", e);
             const data = ae.response?.data as any;
-            alert(`Erreur lors de la suppression: ${data?.error || e.message}`);
+            alert(`Error deleting backup: ${data?.error || e.message}`);
         }
     }
 
@@ -106,9 +100,9 @@
                 <Archive size={24} />
             </div>
             <div>
-                <h3 class="font-semibold text-white">Sauvegardes</h3>
+                <h3 class="font-semibold text-white">Backups</h3>
                 <p class="text-xs text-gray-400">
-                    Gérez les snapshots de votre serveur
+                    Manage your server snapshots
                 </p>
             </div>
         </div>
@@ -123,10 +117,10 @@
                     <div
                         class="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin"
                     ></div>
-                    <span>Création en cours...</span>
+                    <span>Creating...</span>
                 {:else}
                     <Plus size={18} />
-                    <span>Créer une sauvegarde</span>
+                    <span>Create Backup</span>
                 {/if}
             </button>
         </div>
@@ -141,7 +135,7 @@
                 <div
                     class="inline-block w-8 h-8 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mb-4"
                 ></div>
-                <p class="text-gray-500">Chargement des sauvegardes...</p>
+                <p class="text-gray-500">Loading backups...</p>
             </div>
         {:else if error}
             <div
@@ -152,7 +146,7 @@
                 <button
                     onclick={fetchBackups}
                     class="text-blue-400 hover:underline text-sm mt-2 cursor-pointer"
-                    >Réessayer</button
+                    >Retry</button
                 >
             </div>
         {:else if backups.length === 0}
@@ -160,9 +154,9 @@
                 class="p-16 text-center text-gray-500 flex flex-col items-center gap-3"
             >
                 <HardDrive size={48} class="opacity-20" />
-                <p class="text-lg font-medium">Aucune sauvegarde</p>
+                <p class="text-lg font-medium">No backups</p>
                 <p class="text-sm">
-                    Créez votre première sauvegarde pour sécuriser vos données.
+                    Create your first backup to secure your data.
                 </p>
             </div>
         {:else}
@@ -172,11 +166,9 @@
                         class="bg-gray-950 text-gray-200 uppercase text-xs font-semibold"
                     >
                         <tr>
-                            <th scope="col" class="px-6 py-4">Nom</th>
-                            <th scope="col" class="px-6 py-4"
-                                >Date de création</th
-                            >
-                            <th scope="col" class="px-6 py-4">Taille</th>
+                            <th scope="col" class="px-6 py-4">Name</th>
+                            <th scope="col" class="px-6 py-4">Created At</th>
+                            <th scope="col" class="px-6 py-4">Size</th>
                             <th scope="col" class="px-6 py-4 text-right"
                                 >Actions</th
                             >
@@ -207,7 +199,7 @@
                                             href={getDownloadLink(backup.name)}
                                             download
                                             class="p-2 text-blue-400 hover:text-white hover:bg-blue-500 rounded-lg transition-colors cursor-pointer"
-                                            title="Télécharger"
+                                            title="Download"
                                         >
                                             <Download size={18} />
                                         </a>
@@ -215,7 +207,7 @@
                                             onclick={() =>
                                                 deleteBackup(backup.name)}
                                             class="p-2 text-red-400 hover:text-white hover:bg-red-500 rounded-lg transition-colors cursor-pointer"
-                                            title="Supprimer"
+                                            title="Delete"
                                         >
                                             <Trash2 size={18} />
                                         </button>

@@ -43,9 +43,7 @@
 
         // Simple client request validation
         if (!/^[a-zA-Z0-9_-]+$/.test(newWorldName)) {
-            alert(
-                "Nom invalide (alphanurérique, tirets et underscores uniquement)",
-            );
+            alert("Invalid name (alphanumeric, dashes and underscores only)");
             return;
         }
 
@@ -59,7 +57,7 @@
             newWorldName = "";
         } catch (e: any) {
             alert(
-                "Erreur lors de la création: " +
+                "Error creating world: " +
                     (e.response?.data?.error || e.message),
             );
         } finally {
@@ -71,7 +69,7 @@
     async function activateWorld(name: string) {
         if (
             !confirm(
-                `Voulez-vous vraiment activer le monde "${name}" ?\nLe serveur devra être redémarré.`,
+                `Are you sure you want to activate world "${name}"?\nThe server will need to be restarted.`,
             )
         ) {
             return;
@@ -80,12 +78,10 @@
         try {
             await api.post(`/api/servers/${serverId}/worlds/${name}/activate`);
             await fetchWorlds(); // Refresh to see update (active flag)
-            alert(
-                "Monde modifié ! Redémarrez le serveur pour appliquer les changements.",
-            );
+            alert("World changed! Restart the server to apply changes.");
         } catch (e: any) {
             alert(
-                "Erreur lors de l'activation: " +
+                "Error activating world: " +
                     (e.response?.data?.error || e.message),
             );
         }
@@ -95,7 +91,7 @@
     async function deleteWorld(name: string) {
         if (
             !confirm(
-                `Supprimer dÃ©finitivement le monde "${name}" ?\nCette action est irréversible.`,
+                `Permanently delete world "${name}"?\nThis action is irreversible.`,
             )
         ) {
             return;
@@ -106,7 +102,7 @@
             await fetchWorlds();
         } catch (e: any) {
             alert(
-                "Erreur lors de la suppression: " +
+                "Error deleting world: " +
                     (e.response?.data?.error || e.message),
             );
         }
@@ -129,11 +125,11 @@
         <div>
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
                 <Globe class="text-blue-400" />
-                Gestion des Mondes
+                World Management
             </h2>
             <p class="text-gray-400 text-sm mt-1">
-                Gérez vos mondes Minecraft. Le monde actif est celui chargé au
-                démarrage.
+                Manage your Minecraft worlds. The active world is the one loaded
+                at startup.
             </p>
         </div>
         <button
@@ -141,15 +137,13 @@
             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
         >
             <Plus size={18} />
-            Nouveau Monde
+            New World
         </button>
     </div>
 
     <!-- Error/Loading -->
     {#if loading}
-        <div class="text-center py-10 text-gray-400">
-            Chargement des mondes...
-        </div>
+        <div class="text-center py-10 text-gray-400">Loading worlds...</div>
     {:else if error}
         <div
             class="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg flex items-center gap-2"
@@ -159,7 +153,7 @@
         </div>
     {:else if worlds.length === 0}
         <div class="text-center py-10 text-gray-500">
-            Aucun monde trouvé. Créez-en un nouveau !
+            No worlds found. Create a new one!
         </div>
     {:else}
         <!-- Grid -->
@@ -198,7 +192,7 @@
                             <span
                                 class="px-2 py-0.5 rounded text-xs font-bold bg-green-500 text-black uppercase tracking-wide"
                             >
-                                Actif
+                                Active
                             </span>
                         {/if}
                     </div>
@@ -211,15 +205,15 @@
                             <button
                                 on:click={() => activateWorld(world.name)}
                                 class="flex-1 bg-slate-700 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-                                title="Activer ce monde"
+                                title="Activate this world"
                             >
                                 <Check size={16} />
-                                Activer
+                                Activate
                             </button>
                             <button
                                 on:click={() => deleteWorld(world.name)}
                                 class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white p-2 rounded-lg transition-colors shrink-0"
-                                title="Supprimer définitivement"
+                                title="Delete permanently"
                             >
                                 <Trash size={18} />
                             </button>
@@ -227,7 +221,7 @@
                             <div
                                 class="text-sm text-green-400/80 italic w-full text-center py-1.5 cursor-default"
                             >
-                                Monde actuellement chargé
+                                Currently loaded world
                             </div>
                         {/if}
                     </div>
@@ -245,16 +239,14 @@
         <div
             class="bg-slate-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl transform transition-all"
         >
-            <h3 class="text-xl font-bold text-white mb-4">
-                Créer un nouveau monde
-            </h3>
+            <h3 class="text-xl font-bold text-white mb-4">Create New World</h3>
 
             <div class="space-y-4">
                 <div>
                     <label
                         for="worldName"
                         class="block text-sm font-medium text-gray-400 mb-1"
-                        >Nom du monde</label
+                        >World Name</label
                     >
                     <input
                         id="worldName"
@@ -264,7 +256,7 @@
                         class="w-full bg-slate-950 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     />
                     <p class="text-xs text-gray-500 mt-1">
-                        Caractères autorisés : lettres, chiffres, tirets,
+                        Allowed characters: letters, numbers, dashes,
                         underscores.
                     </p>
                 </div>
@@ -278,7 +270,7 @@
                         class="px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-colors"
                         disabled={creating}
                     >
-                        Annuler
+                        Cancel
                     </button>
                     <button
                         on:click={createWorld}
@@ -290,7 +282,7 @@
                                 class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
                             ></div>
                         {/if}
-                        Créer
+                        Create
                     </button>
                 </div>
             </div>

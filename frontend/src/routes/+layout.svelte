@@ -46,7 +46,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Crafteur - Gérez votre serveur Minecraft</title>
+	<title>Crafteur - Manage your Minecraft server</title>
 </svelte:head>
 
 <div class="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
@@ -83,13 +83,13 @@
 							>
 							<button
 								class="rounded-md px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer"
-								>Déconnexion</button
+								>Logout</button
 							>
 						{:else}
 							<a
 								href="/login"
 								class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 transition-colors shadow-lg shadow-green-900/20"
-								>Connexion</a
+								>Login</a
 							>
 						{/if}
 					</div>
@@ -147,13 +147,13 @@
 						<button
 							onclick={handleLogout}
 							class="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
-							>Déconnexion</button
+							>Logout</button
 						>
 					{:else}
 						<a
 							href="/login"
 							class="block rounded-md px-3 py-2 text-base font-medium text-slate-300 hover:bg-slate-700 hover:text-white"
-							>Connexion</a
+							>Login</a
 						>
 					{/if}
 				</div>

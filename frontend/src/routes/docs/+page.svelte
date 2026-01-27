@@ -70,7 +70,7 @@
             <div
                 class="mt-20 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm"
             >
-                <p>Besoin de plus d'aide ? Contactez le support.</p>
+                <p>Need more help? Contact support.</p>
             </div>
         </div>
     </div>

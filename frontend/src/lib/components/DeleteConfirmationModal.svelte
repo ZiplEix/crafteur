@@ -46,8 +46,9 @@
             console.error("Delete error", err);
             error =
                 err.response?.data?.error ||
+                err.response?.data?.error ||
                 err.message ||
-                "Erreur lors de la suppression";
+                "Error deleting server";
         } finally {
             loading = false;
         }
@@ -75,7 +76,7 @@
             >
                 <div class="flex items-center gap-3 text-red-500">
                     <AlertTriangle size={24} />
-                    <h2 class="text-xl font-bold">Zone de Danger</h2>
+                    <h2 class="text-xl font-bold">Danger Zone</h2>
                 </div>
                 <button
                     onclick={onClose}
@@ -89,16 +90,16 @@
             <div class="p-6 space-y-6">
                 <div class="space-y-2">
                     <p class="text-slate-300">
-                        Supprimer ce serveur est <strong class="text-red-400"
-                            >irréversible</strong
-                        >. Toutes les données, mondes, backups et configurations
-                        seront définitivement perdus.
+                        Deleting this server is <strong class="text-red-400"
+                            >irreversible</strong
+                        >. All data, worlds, backups, and configurations will be
+                        permanently lost.
                     </p>
                     <p class="text-slate-400 text-sm">
-                        Veuillez taper <strong
+                        Please type <strong
                             class="text-white bg-slate-800 px-1 py-0.5 rounded select-all"
                             >{serverName}</strong
-                        > pour confirmer.
+                        > to confirm.
                     </p>
                 </div>
 
@@ -127,9 +128,9 @@
                             <div
                                 class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
                             ></div>
-                            Suppression...
+                            Deleting...
                         {:else}
-                            Confirmer la suppression
+                            Confirm Deletion
                         {/if}
                     </button>
                 </div>

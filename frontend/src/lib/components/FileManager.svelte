@@ -46,7 +46,7 @@
             currentPath = path;
         } catch (e) {
             console.error(e);
-            error = "Impossible de charger les fichiers";
+            error = "Failed to load files";
         } finally {
             loading = false;
         }
@@ -80,7 +80,7 @@
     }
 
     async function handleCreateDir() {
-        const name = prompt("Nom du nouveau dossier :");
+        const name = prompt("New folder name:");
         if (!name) return;
         try {
             await api.post(`/api/servers/${serverId}/files/directory`, {
@@ -89,12 +89,12 @@
             });
             loadFiles(currentPath);
         } catch (e) {
-            alert("Erreur lors de la création du dossier");
+            alert("Error creating folder");
         }
     }
 
     async function handleDelete(filename: string) {
-        if (!confirm(`Voulez-vous vraiment supprimer ${filename} ?`)) return;
+        if (!confirm(`Are you sure you want to delete ${filename} ?`)) return;
         try {
             const targetPath =
                 currentPath === "/"
@@ -105,7 +105,7 @@
             });
             loadFiles(currentPath);
         } catch (e) {
-            alert("Erreur lors de la suppression");
+            alert("Error deleting file");
         }
     }
 
@@ -127,7 +127,7 @@
             });
             loadFiles(currentPath);
         } catch (e) {
-            alert("Erreur lors de l'upload");
+            alert("Upload failed");
         } finally {
             isUploading = false;
             target.value = ""; // Reset input
@@ -135,17 +135,17 @@
     }
 
     async function handleUnzip(filename: string) {
-        if (!confirm(`Voulez-vous dézipper ${filename} ici ?`)) return;
+        if (!confirm(`Do you want to unzip ${filename} here?`)) return;
         try {
             await api.post(`/api/servers/${serverId}/files/unzip`, {
                 path: currentPath,
                 filename,
             });
             loadFiles(currentPath);
-            alert("Décompression terminée");
+            alert("Unzip complete");
         } catch (e) {
             console.error(e);
-            alert("Erreur lors de la décompression");
+            alert("Unzip failed");
         }
     }
 
@@ -214,7 +214,7 @@
                 class="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-sm transition-colors cursor-pointer"
             >
                 <FolderPlus size={16} />
-                Nouveau
+                New Folder
             </button>
         </div>
     </div>
@@ -228,7 +228,7 @@
         hover:[&::-webkit-scrollbar-thumb]:bg-gray-600"
     >
         {#if loading}
-            <div class="p-8 text-center text-gray-500">Chargement...</div>
+            <div class="p-8 text-center text-gray-500">Loading...</div>
         {:else if error}
             <div class="p-8 text-center text-red-400">{error}</div>
         {:else}
@@ -238,8 +238,8 @@
                 >
                     <tr>
                         <th scope="col" class="px-6 py-3 w-10">Type</th>
-                        <th scope="col" class="px-6 py-3">Nom</th>
-                        <th scope="col" class="px-6 py-3">Taille</th>
+                        <th scope="col" class="px-6 py-3">Name</th>
+                        <th scope="col" class="px-6 py-3">Size</th>
                         <th scope="col" class="px-6 py-3">Date</th>
                         <th scope="col" class="px-6 py-3 text-right">Actions</th
                         >
@@ -303,7 +303,7 @@
                                             onclick={() =>
                                                 handleUnzip(file.name)}
                                             class="text-blue-400 hover:text-blue-300 p-1 rounded hover:bg-blue-400/10 cursor-pointer"
-                                            title="Dézipper"
+                                            title="Unzip"
                                         >
                                             <Archive size={16} />
                                         </button>
@@ -311,7 +311,7 @@
                                     <button
                                         onclick={() => handleDelete(file.name)}
                                         class="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-400/10 cursor-pointer"
-                                        title="Supprimer"
+                                        title="Delete"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -325,7 +325,7 @@
                                 colspan="5"
                                 class="px-6 py-8 text-center text-gray-500 italic"
                             >
-                                Dossier vide
+                                Empty folder
                             </td>
                         </tr>
                     {/if}

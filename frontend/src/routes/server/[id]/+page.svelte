@@ -135,19 +135,17 @@
             properties = res.data;
         } catch (e) {
             console.error("Failed to fetch properties", e);
-            alert("Erreur lors du chargement de la configuration");
+            alert("Error loading configuration");
         }
     }
 
     async function saveProperties() {
         try {
             await api.post(`/api/servers/${serverId}/properties`, properties);
-            alert(
-                "Configuration sauvegardée ! Redémarrez le serveur pour appliquer.",
-            );
+            alert("Configuration saved! Restart server to apply.");
         } catch (e) {
             console.error("Failed to save properties", e);
-            alert("Erreur lors de la sauvegarde");
+            alert("Error saving");
         }
     }
 
@@ -265,7 +263,7 @@
 
         if (
             !confirm(
-                `ATTENTION: Changer de version pour la ${selectedVersion} peut corrompre votre monde si vous downgradez.\nIl est fortement recommandé de faire une sauvegarde avant.\n\nVoulez-vous continuer ?`,
+                `WARNING: Changing version to ${selectedVersion} may corrupt your world if downgrading.\nIt is strongly recommended to backup first.\n\nDo you want to continue?`,
             )
         ) {
             return;
@@ -277,7 +275,7 @@
                 version: selectedVersion,
             });
             alert(
-                `Version changée vers ${selectedVersion}. Le serveur redémarre...`,
+                `Version changed to ${selectedVersion}. Server restarting...`,
             );
             // Reload server details
             fetchServer();
@@ -285,7 +283,7 @@
         } catch (e: any) {
             console.error("Failed to change version", e);
             alert(
-                "Erreur lors du changement de version: " +
+                "Error changing version: " +
                     (e.response?.data?.error || e.message),
             );
         } finally {
@@ -312,9 +310,9 @@
 
 <div class="container mx-auto p-6 max-w-7xl">
     {#if loading}
-        <div class="text-white">Chargement...</div>
+        <div class="text-white">Loading...</div>
     {:else if error}
-        <div class="text-red-500">Erreur: {error}</div>
+        <div class="text-red-500">Error: {error}</div>
     {:else if server}
         <!-- Header -->
         <div
@@ -395,7 +393,7 @@
                         class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium cursor-pointer"
                     >
                         <Play size={18} />
-                        Démarrer
+                        Start
                     </button>
                 {:else}
                     <button
@@ -403,7 +401,7 @@
                         class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors font-medium cursor-pointer"
                     >
                         <Square size={18} />
-                        Arrêter
+                        Stop
                     </button>
                     {#if server.status === "RUNNING"}
                         <button
@@ -414,7 +412,7 @@
                             class="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors font-medium cursor-pointer"
                         >
                             <RotateCw size={18} />
-                            Redémarrer
+                            Restart
                         </button>
                     {/if}
                 {/if}
@@ -453,7 +451,7 @@
                     >
                         {#if logs.length === 0}
                             <div class="text-gray-500 italic">
-                                En attente de logs...
+                                Waiting for logs...
                             </div>
                         {/if}
                         {#each logs as log}
@@ -477,7 +475,7 @@
                         <input
                             type="text"
                             bind:value={commandInput}
-                            placeholder="Envoyer une commande..."
+                            placeholder="Send a command..."
                             class="flex-1 bg-black text-gray-200 p-3 font-mono border-b border-r border-gray-800 rounded-br-lg focus:outline-none focus:bg-gray-950 transition-colors"
                         />
                     </form>
@@ -504,16 +502,16 @@
                             class="text-xl font-semibold text-white mb-4 flex items-center gap-2"
                         >
                             <RotateCw size={20} class="text-blue-400" />
-                            Version du Serveur
+                            Server Version
                         </h3>
                         <div class="flex flex-col md:flex-row gap-4 items-end">
                             <div class="flex-1 space-y-2 w-full">
                                 <label
                                     for="serverVersion"
                                     class="text-sm font-medium text-gray-400"
-                                    >Version Actuelle: <span
+                                    >Current Version: <span
                                         class="text-white font-bold"
-                                        >{server.version || "Inconnue"}</span
+                                        >{server.version || "Unknown"}</span
                                     ></label
                                 >
                                 <select
@@ -522,7 +520,7 @@
                                     class="w-full bg-slate-900 border border-gray-600 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                 >
                                     <option value="" disabled selected
-                                        >Choisir une nouvelle version...</option
+                                        >Choose a new version...</option
                                     >
                                     {#each $versions as v}
                                         <option value={v.id}
@@ -545,9 +543,9 @@
                                     <div
                                         class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
                                     ></div>
-                                    Installation...
+                                    Installing...
                                 {:else}
-                                    Changer la version
+                                    Change version
                                 {/if}
                             </button>
                         </div>
@@ -619,8 +617,8 @@
                                                 >
                                                     {properties[f.key] ===
                                                     "true"
-                                                        ? "Activé"
-                                                        : "Désactivé"}
+                                                        ? "Enabled"
+                                                        : "Disabled"}
                                                 </span>
                                             </div>
                                         {:else}
@@ -645,7 +643,7 @@
                             class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-transform hover:scale-105 font-medium cursor-pointer"
                         >
                             <Save size={20} />
-                            Sauvegarder la configuration
+                            Save configuration
                         </button>
                     </div>
 
@@ -659,19 +657,19 @@
                                     class="text-xl font-bold text-red-500 mb-1 flex items-center gap-2"
                                 >
                                     <AlertTriangle size={20} />
-                                    Zone de Danger
+                                    Danger Zone
                                 </h3>
                                 <p class="text-red-400/80 text-sm max-w-xl">
-                                    Supprimer ce serveur est irréversible.
-                                    Toutes les données, mondes et configurations
-                                    seront définitivement perdus.
+                                    Deleting this server is irreversible. All
+                                    data, worlds, and configurations will be
+                                    permanently lost.
                                 </p>
                             </div>
                             <button
                                 on:click={() => (showDeleteModal = true)}
                                 class="bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/50 hover:border-red-600 px-6 py-2.5 rounded-lg font-bold transition-all whitespace-nowrap"
                             >
-                                Supprimer le serveur
+                                Delete server
                             </button>
                         </div>
                     </div>
@@ -692,8 +690,8 @@
                 >
                     <Folder size={48} class="mb-4 opacity-50" />
                     <p class="text-lg">
-                        Section {tabs.find((t) => t.id === activeTab)?.label} en
-                        cours de développement
+                        Section {tabs.find((t) => t.id === activeTab)?.label} under
+                        development
                     </p>
                 </div>
             {/if}
