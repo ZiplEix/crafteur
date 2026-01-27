@@ -227,12 +227,14 @@
                     <!-- Controls -->
                     <button
                         onclick={prevSlide}
+                        aria-label="Previous slide"
                         class="absolute left-4 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 hover:cursor-pointer"
                     >
                         <ChevronLeft class="w-6 h-6" />
                     </button>
                     <button
                         onclick={nextSlide}
+                        aria-label="Next slide"
                         class="absolute right-4 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70 hover:cursor-pointer"
                     >
                         <ChevronRight class="w-6 h-6" />
@@ -242,6 +244,7 @@
                     <div class="absolute bottom-4 flex gap-2">
                         {#each screens as _, i}
                             <button
+                                aria-label="Go to slide {i + 1}"
                                 onclick={() => (currentSlide = i)}
                                 class="w-2 h-2 rounded-full transition-all hover:cursor-pointer {currentSlide ===
                                 i

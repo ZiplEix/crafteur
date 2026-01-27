@@ -25,9 +25,9 @@ curl -sL get.crafteur.fr | sudo bash
 
 ## Prochaines Étapes
 
-1. [Configuration initiale](#)
-2. [Créer votre premier serveur](#)
-3. [Gérer les mods et plugins](#)
+1. [Configuration initiale](/docs/configuration)
+2. [Créer votre premier serveur](/docs/create-server)
+3. [Gérer les mods et plugins](/docs/mods-plugins)
 
 ---
 
