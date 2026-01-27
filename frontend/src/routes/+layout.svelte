@@ -5,6 +5,7 @@
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
 	import { api } from "$lib/api";
+	import { Book } from "lucide-svelte";
 
 	let { children } = $props();
 	let user = $state(null);
@@ -67,6 +68,13 @@
 
 				<div class="hidden md:block">
 					<div class="ml-10 flex items-baseline space-x-4">
+						<a
+							href="/docs"
+							class="rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center space-x-2"
+						>
+							<Book size={18} />
+							<span>Documentation</span>
+						</a>
 						{#if user}
 							<a
 								href="/dashboard"
