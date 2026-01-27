@@ -11,6 +11,10 @@
         Code,
         Copy,
         Check,
+        Globe,
+        Users,
+        Zap,
+        Calendar,
     } from "lucide-svelte";
 
     let copied = $state(false);
@@ -66,6 +70,34 @@
                 "100% gratuit et auto-hébergeable. Code ouvert, communauté active, aucune limite.",
             icon: Code,
             color: "text-orange-400",
+        },
+        {
+            title: "Gestion des Mondes",
+            description:
+                "Créez des mondes multiples, importez vos maps existantes (ZIP) et changez d'univers à la volée.",
+            icon: Globe,
+            color: "text-indigo-400",
+        },
+        {
+            title: "Gestion Joueurs",
+            description:
+                "Gérez facilement la Whitelist, les Opérateurs (OP) et bannissez les indésirables.",
+            icon: Users,
+            color: "text-red-400",
+        },
+        {
+            title: "Performance Maximale",
+            description:
+                "Propulsé par un backend Go ultra-léger pour une utilisation minimale des ressources.",
+            icon: Zap,
+            color: "text-yellow-400",
+        },
+        {
+            title: "Automatisation",
+            description:
+                "Planifiez des redémarrages automatiques, des commandes récurrentes et des annonces.",
+            icon: Calendar,
+            color: "text-purple-400",
         },
     ];
 </script>
