@@ -13,6 +13,7 @@
         Play,
         Square,
         RotateCw,
+        Globe,
     } from "lucide-svelte";
     import { configGroups } from "$lib/config_schema";
     import type { ServerStats } from "$lib/types/server";
@@ -22,6 +23,7 @@
     import LogViewer from "$lib/components/LogViewer.svelte";
     import BackupManager from "$lib/components/BackupManager.svelte";
     import ScheduleManager from "$lib/components/ScheduleManager.svelte";
+    import WorldManager from "$lib/components/WorldManager.svelte";
 
     interface ServerDetail {
         id: string;
@@ -30,6 +32,8 @@
         port: number;
         status: string;
         ram: number;
+        version: string;
+        java_version: number;
     }
 
     let server: ServerDetail | null = null;
@@ -53,6 +57,7 @@
         { id: "schedule", label: "Schedule", icon: Calendar },
         { id: "save", label: "Backups", icon: Save },
         { id: "file", label: "File", icon: Folder },
+        { id: "world", label: "Worlds", icon: Globe },
         { id: "configuration", label: "Configuration", icon: Settings },
         { id: "player", label: "Player", icon: Users },
     ];
@@ -526,6 +531,8 @@
                                                 class="flex items-center h-[42px]"
                                             >
                                                 <button
+                                                    type="button"
+                                                    aria-label="Toggle {f.label}"
                                                     on:click={() =>
                                                         (properties[f.key] =
                                                             properties[
@@ -590,6 +597,8 @@
                 <ScheduleManager serverId={server.id} />
             {:else if activeTab === "save"}
                 <BackupManager serverId={server.id} />
+            {:else if activeTab === "world"}
+                <WorldManager serverId={server.id} />
             {:else}
                 <div
                     class="flex flex-col items-center justify-center h-64 text-gray-400"

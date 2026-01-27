@@ -68,6 +68,7 @@ func main() {
 	logService := services.NewLogService("data/servers")
 	backupService := services.NewBackupService("data/servers", "data/backups")
 	schedulerService := services.NewSchedulerService(serverService)
+	worldService := services.NewWorldService(serverService, "data/servers")
 
 	serverCtrl := controller.NewServerController(serverService)
 	fileCtrl := controller.NewFileController(fileService)
@@ -75,6 +76,7 @@ func main() {
 	logCtrl := controller.NewLogController(logService)
 	backupCtrl := controller.NewBackupController(backupService)
 	schedulerCtrl := controller.NewSchedulerController(schedulerService)
+	worldCtrl := controller.NewWorldController(worldService)
 
 	e := echo.New()
 
@@ -95,7 +97,7 @@ func main() {
 		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 
-	routes.Register(e, serverCtrl, fileCtrl, playerCtrl, logCtrl, backupCtrl, schedulerCtrl)
+	routes.Register(e, serverCtrl, fileCtrl, playerCtrl, logCtrl, backupCtrl, schedulerCtrl, worldCtrl)
 
 	assetHandler := http.FileServer(getFileSystem())
 	e.GET("/*", echo.WrapHandler(assetHandler))
