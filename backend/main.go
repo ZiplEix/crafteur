@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/ZiplEix/crafteur/controller"
 	"github.com/ZiplEix/crafteur/database"
@@ -107,8 +108,13 @@ func main() {
 
 	routes.Register(e, serverCtrl, fileCtrl, playerCtrl, logCtrl, backupCtrl, schedulerCtrl, worldCtrl, addonCtrl, modrinthCtrl)
 
-	assetHandler := http.FileServer(getFileSystem())
-	e.GET("/*", echo.WrapHandler(assetHandler))
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Filesystem: getFileSystem(),
+		HTML5:      true,
+		Skipper: func(c echo.Context) bool {
+			return strings.HasPrefix(c.Path(), "/api")
+		},
+	}))
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
