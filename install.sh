@@ -83,8 +83,15 @@ systemctl daemon-reload
 
 # 5. Initialisation Admin
 echo -e "${GREEN}Initialisation du compte Admin${NC}"
-read -p "Entrez le nom d'utilisateur Admin : " ADMIN_USER < /dev/tty
-read -s -p "Entrez le mot de passe : " ADMIN_PASS < /dev/tty
+
+if [ -t 0 ]; then
+    read -p "Entrez le nom d'utilisateur Admin : " ADMIN_USER
+    read -s -p "Entrez le mot de passe : " ADMIN_PASS
+else
+    read -p "Entrez le nom d'utilisateur Admin : " ADMIN_USER < /dev/tty
+    read -s -p "Entrez le mot de passe : " ADMIN_PASS < /dev/tty
+fi
+
 echo ""
 
 if [ -z "$ADMIN_USER" ] || [ -z "$ADMIN_PASS" ]; then
@@ -93,7 +100,9 @@ if [ -z "$ADMIN_USER" ] || [ -z "$ADMIN_PASS" ]; then
 fi
 
 echo "Création de l'utilisateur admin..."
-sudo -u crafteur /opt/crafteur/crafteur create-user "$ADMIN_USER" "$ADMIN_PASS"
+
+cd /opt/crafteur
+sudo -u crafteur ./crafteur create-user "$ADMIN_USER" "$ADMIN_PASS"
 
 # 6. Démarrage
 echo -e "${GREEN}Démarrage du service...${NC}"
