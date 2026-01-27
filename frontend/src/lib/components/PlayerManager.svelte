@@ -153,7 +153,7 @@
                     </h3>
                     <button
                         onclick={closeSanctionModal}
-                        class="text-gray-400 hover:text-white"
+                        class="text-gray-400 hover:text-white cursor-pointer"
                         aria-label="Fermer"
                     >
                         <X size={24} />
@@ -176,13 +176,13 @@
                 <div class="flex justify-end gap-3">
                     <button
                         onclick={closeSanctionModal}
-                        class="px-4 py-2 rounded bg-slate-700 text-white hover:bg-slate-600 transition-colors"
+                        class="px-4 py-2 rounded bg-slate-700 text-white hover:bg-slate-600 transition-colors cursor-pointer"
                     >
                         Annuler
                     </button>
                     <button
                         onclick={confirmSanction}
-                        class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors font-medium"
+                        class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors font-medium cursor-pointer"
                     >
                         Confirmer
                     </button>
@@ -234,7 +234,7 @@
                         <div class="flex gap-2">
                             <button
                                 onclick={() => handleAction(entry.name, "op")}
-                                class="p-1.5 text-green-400 hover:bg-green-400/10 rounded transition-colors"
+                                class="p-1.5 text-green-400 hover:bg-green-400/10 rounded transition-colors cursor-pointer"
                                 title="Promouvoir OP"
                             >
                                 <Shield size={18} />
@@ -242,7 +242,7 @@
                             <button
                                 onclick={() =>
                                     openSanctionModal(entry.name, "kick")}
-                                class="p-1.5 text-orange-400 hover:bg-orange-400/10 rounded transition-colors"
+                                class="p-1.5 text-orange-400 hover:bg-orange-400/10 rounded transition-colors cursor-pointer"
                                 title="Ejecter (Kick)"
                             >
                                 <DoorOpen size={18} />
@@ -250,7 +250,7 @@
                             <button
                                 onclick={() =>
                                     openSanctionModal(entry.name, "ban")}
-                                class="p-1.5 text-red-400 hover:bg-red-400/10 rounded transition-colors"
+                                class="p-1.5 text-red-400 hover:bg-red-400/10 rounded transition-colors cursor-pointer"
                                 title="Bannir"
                             >
                                 <Ban size={18} />
@@ -293,7 +293,7 @@
                         </div>
                         <button
                             onclick={() => handleAction(entry.name, "deop")}
-                            class="p-1.5 text-orange-400 hover:bg-orange-400/10 rounded transition-colors"
+                            class="p-1.5 text-orange-400 hover:bg-orange-400/10 rounded transition-colors cursor-pointer"
                             title="Retirer OP"
                         >
                             <ShieldX size={18} />
@@ -337,7 +337,7 @@
                         </div>
                         <button
                             onclick={() => handleAction(entry.name, "pardon")}
-                            class="p-1.5 text-blue-400 hover:bg-blue-400/10 rounded transition-colors"
+                            class="p-1.5 text-blue-400 hover:bg-blue-400/10 rounded transition-colors cursor-pointer"
                             title="Débannir (Pardon)"
                         >
                             <Undo size={18} />

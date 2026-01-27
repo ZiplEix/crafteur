@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *controller.FileController, playerCtrl *controller.PlayerController, logCtrl *controller.LogController, backupCtrl *controller.BackupController) {
+func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *controller.FileController, playerCtrl *controller.PlayerController, logCtrl *controller.LogController, backupCtrl *controller.BackupController, schedulerCtrl *controller.SchedulerController) {
 	api := e.Group("/api")
 
 	// Public Routes
@@ -58,4 +58,9 @@ func Register(e *echo.Echo, serverCtrl *controller.ServerController, fileCtrl *c
 	protected.POST("/servers/:id/backups", backupCtrl.CreateBackup)
 	protected.GET("/servers/:id/backups/:filename", backupCtrl.DownloadBackup)
 	protected.DELETE("/servers/:id/backups/:filename", backupCtrl.DeleteBackup)
+
+	// Scheduler Routes
+	protected.GET("/servers/:id/tasks", schedulerCtrl.ListTasks)
+	protected.POST("/servers/:id/tasks", schedulerCtrl.CreateTask)
+	protected.DELETE("/servers/:id/tasks/:taskId", schedulerCtrl.DeleteTask)
 }

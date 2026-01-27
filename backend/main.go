@@ -66,14 +66,23 @@ func main() {
 	playerService := services.NewPlayerService(mcManager, "data")
 	logService := services.NewLogService("data/servers")
 	backupService := services.NewBackupService("data/servers", "data/backups")
+	schedulerService := services.NewSchedulerService(serverService)
 
 	serverCtrl := controller.NewServerController(serverService)
 	fileCtrl := controller.NewFileController(fileService)
 	playerCtrl := controller.NewPlayerController(playerService, serverService)
 	logCtrl := controller.NewLogController(logService)
 	backupCtrl := controller.NewBackupController(backupService)
+	schedulerCtrl := controller.NewSchedulerController(schedulerService)
 
 	e := echo.New()
+
+	// Load tasks on startup
+	if err := schedulerService.LoadTasks(); err != nil {
+		e.Logger.Error("Failed to load scheduled tasks:", err)
+	}
+	schedulerService.Start()
+	defer schedulerService.Stop()
 
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
@@ -85,7 +94,7 @@ func main() {
 		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 
-	routes.Register(e, serverCtrl, fileCtrl, playerCtrl, logCtrl, backupCtrl)
+	routes.Register(e, serverCtrl, fileCtrl, playerCtrl, logCtrl, backupCtrl, schedulerCtrl)
 
 	assetHandler := http.FileServer(getFileSystem())
 	e.GET("/*", echo.WrapHandler(assetHandler))

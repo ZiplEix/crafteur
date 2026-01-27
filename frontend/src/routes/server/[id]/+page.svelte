@@ -19,6 +19,7 @@
     import PlayerManager from "$lib/components/PlayerManager.svelte";
     import LogViewer from "$lib/components/LogViewer.svelte";
     import BackupManager from "$lib/components/BackupManager.svelte";
+    import ScheduleManager from "$lib/components/ScheduleManager.svelte";
 
     interface ServerDetail {
         id: string;
@@ -406,13 +407,15 @@
                     <div class="sticky bottom-6 flex justify-end pt-4">
                         <button
                             on:click={saveProperties}
-                            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-transform hover:scale-105 font-medium"
+                            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg transition-transform hover:scale-105 font-medium cursor-pointer"
                         >
                             <Save size={20} />
                             Sauvegarder la configuration
                         </button>
                     </div>
                 </div>
+            {:else if activeTab === "schedule"}
+                <ScheduleManager serverId={server.id} />
             {:else if activeTab === "save"}
                 <BackupManager serverId={server.id} />
             {:else}

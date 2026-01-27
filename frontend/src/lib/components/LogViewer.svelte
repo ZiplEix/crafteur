@@ -126,7 +126,7 @@
             <h3 class="font-semibold text-gray-200">Fichiers</h3>
             <button
                 onclick={fetchLogs}
-                class="text-gray-400 hover:text-white transition-colors"
+                class="text-gray-400 hover:text-white transition-colors cursor-pointer"
             >
                 <RefreshCw size={16} />
             </button>
@@ -158,7 +158,7 @@
                         class="w-full text-left px-4 py-3 border-b border-gray-900 hover:bg-gray-900 transition-colors flex flex-col gap-1
                          {selectedFile === log.name
                             ? 'bg-gray-900 border-l-2 border-l-blue-500'
-                            : 'border-l-2 border-l-transparent text-gray-400'}"
+                            : 'border-l-2 border-l-transparent text-gray-400'} cursor-pointer"
                     >
                         <div
                             class="font-medium text-sm truncate {selectedFile ===

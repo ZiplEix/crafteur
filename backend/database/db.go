@@ -35,6 +35,17 @@ func InitDB() {
 		id TEXT PRIMARY KEY,
 		username TEXT UNIQUE,
 		password_hash TEXT
+	);
+
+	CREATE TABLE IF NOT EXISTS scheduled_tasks (
+		id TEXT PRIMARY KEY,
+		server_id TEXT,
+		name TEXT,
+		action TEXT,
+		payload TEXT,
+		cron_expression TEXT,
+		one_shot BOOLEAN,
+		last_run DATETIME
 	);`
 
 	if _, err := DB.Exec(query); err != nil {

@@ -117,7 +117,7 @@
             <button
                 onclick={createBackup}
                 disabled={isCreating}
-                class="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-all font-medium shadow-lg hover:shadow-green-900/20 active:scale-95"
+                class="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-all font-medium shadow-lg hover:shadow-green-900/20 active:scale-95 cursor-pointer"
             >
                 {#if isCreating}
                     <div
@@ -151,7 +151,7 @@
                 <p>{error}</p>
                 <button
                     onclick={fetchBackups}
-                    class="text-blue-400 hover:underline text-sm mt-2"
+                    class="text-blue-400 hover:underline text-sm mt-2 cursor-pointer"
                     >Réessayer</button
                 >
             </div>
