@@ -2,7 +2,7 @@ package main
 
 import (
 	"embed"
-	"flag"
+
 	"fmt"
 	"io/fs"
 	"log"
@@ -32,22 +32,22 @@ func getFileSystem() http.FileSystem {
 func main() {
 	database.InitDB()
 
-	// CLI Flags for user creation
-	createUser := flag.String("create-user", "", "Create a new user")
-	password := flag.String("password", "", "Password for the new user")
-	flag.Parse()
-
-	if *createUser != "" {
-		if *password == "" {
-			fmt.Println("Error: Password is required when creating a user")
+	// Check for CLI commands
+	if len(os.Args) > 1 && os.Args[1] == "create-user" {
+		if len(os.Args) != 4 {
+			fmt.Println("Usage: ./crafteur create-user <username> <password>")
 			os.Exit(1)
 		}
-		err := services.Register(*createUser, *password)
-		if err != nil {
+
+		username := os.Args[2]
+		password := os.Args[3]
+
+		if err := services.Register(username, password); err != nil {
 			fmt.Printf("Error creating user: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("User '%s' created successfully.\n", *createUser)
+
+		fmt.Printf("User '%s' created successfully.\n", username)
 		os.Exit(0)
 	}
 
