@@ -685,7 +685,7 @@
             {:else if activeTab === "world"}
                 <WorldManager serverId={server.id} />
             {:else if activeTab === "addons"}
-                <AddonManager serverId={server.id} />
+                <AddonManager serverId={server.id} serverType={server.type} />
             {:else}
                 <div
                     class="flex flex-col items-center justify-center h-64 text-gray-400"

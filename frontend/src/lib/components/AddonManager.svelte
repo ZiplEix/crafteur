@@ -16,6 +16,7 @@
     import ModrinthBrowser from "./ModrinthBrowser.svelte";
 
     export let serverId: string;
+    export let serverType: string;
 
     let activeTab: AddonType = "mods";
     // 'installed' or 'catalog'
@@ -27,12 +28,48 @@
     let error: string | null = null;
     let fileInput: HTMLInputElement;
 
-    const tabs: { id: AddonType; label: string; icon: any; accept: string }[] =
-        [
-            { id: "mods", label: "Mods", icon: Package, accept: ".jar" },
-            { id: "plugins", label: "Plugins", icon: Zap, accept: ".jar" },
-            { id: "datapacks", label: "Datapacks", icon: Box, accept: ".zip" },
-        ];
+    $: availableTabs = (() => {
+        const t: { id: AddonType; label: string; icon: any; accept: string }[] =
+            [];
+
+        // Logique Fabric (Mods)
+        if (serverType === "fabric") {
+            t.push({
+                id: "mods",
+                label: "Mods",
+                icon: Package,
+                accept: ".jar",
+            });
+        }
+
+        // Logique Paper (Plugins)
+        if (serverType === "paper") {
+            t.push({
+                id: "plugins",
+                label: "Plugins",
+                icon: Zap,
+                accept: ".jar",
+            });
+        }
+
+        // Logique Universelle (Datapacks)
+        t.push({
+            id: "datapacks",
+            label: "Datapacks",
+            icon: Box,
+            accept: ".zip",
+        });
+
+        return t;
+    })();
+
+    // Security: Auto-switch if active tab is invalid for current server type
+    $: if (
+        availableTabs.length > 0 &&
+        !availableTabs.find((t) => t.id === activeTab)
+    ) {
+        activeTab = availableTabs[0].id;
+    }
 
     async function loadAddons() {
         if (viewMode === "catalog") return; // Don't load files if in catalog mode
@@ -145,7 +182,7 @@
     >
         <div class="flex items-center gap-4">
             <div class="flex bg-gray-800/50 p-1 rounded-lg">
-                {#each tabs as tab}
+                {#each availableTabs as tab}
                     <button
                         on:click={() => (activeTab = tab.id)}
                         class="flex items-center gap-2 px-4 py-2 rounded-md transition-all text-sm font-medium
@@ -206,7 +243,8 @@
                     bind:this={fileInput}
                     type="file"
                     multiple
-                    accept={tabs.find((t) => t.id === activeTab)?.accept}
+                    accept={availableTabs.find((t) => t.id === activeTab)
+                        ?.accept}
                     class="hidden"
                     on:change={handleUpload}
                 />
@@ -236,13 +274,14 @@
                 >
                     <div class="bg-gray-800/50 p-4 rounded-full">
                         <svelte:component
-                            this={tabs.find((t) => t.id === activeTab)?.icon}
+                            this={availableTabs.find((t) => t.id === activeTab)
+                                ?.icon}
                             size={48}
                             class="opacity-50"
                         />
                     </div>
                     <p>
-                        Aucun {tabs
+                        Aucun {availableTabs
                             .find((t) => t.id === activeTab)
                             ?.label.toLowerCase()
                             .slice(0, -1)} installé.
