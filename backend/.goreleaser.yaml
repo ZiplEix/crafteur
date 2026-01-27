@@ -1,0 +1,41 @@
+version: 2
+
+project_name: crafteur
+
+before:
+  hooks:
+    - go mod tidy
+    - sh -c "cd ../frontend && bun install && bun run build"
+
+builds:
+  - env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+
+    goarch:
+      - amd64
+      - arm64
+
+    binary: crafteur
+
+    flags:
+      - -s -w
+
+archives:
+  - formats: binary
+
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
