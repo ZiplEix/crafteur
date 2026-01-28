@@ -15,6 +15,7 @@ import (
 	"github.com/ZiplEix/crafteur/minecraft"
 	"github.com/ZiplEix/crafteur/routes"
 	"github.com/ZiplEix/crafteur/services"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -31,6 +32,8 @@ func getFileSystem() http.FileSystem {
 }
 
 func main() {
+	godotenv.Load()
+
 	database.InitDB()
 
 	// Check for CLI commands
@@ -116,5 +119,10 @@ func main() {
 		},
 	}))
 
-	e.Logger.Fatal(e.Start(":8080"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
