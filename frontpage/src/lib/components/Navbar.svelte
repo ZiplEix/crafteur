@@ -21,7 +21,7 @@
                 href="/#features"
                 class="text-sm font-medium text-slate-300 hover:text-white transition-colors"
             >
-                Fonctionnalités
+                Features
             </a>
             <a
                 href="/#install"
@@ -56,7 +56,7 @@
                 class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-900/20 hover:bg-green-500 hover:shadow-green-900/40 transition-all focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-slate-900"
             >
                 <Download class="h-4 w-4" />
-                <span>Télécharger</span>
+                <span>Download</span>
             </a>
         </div>
     </div>

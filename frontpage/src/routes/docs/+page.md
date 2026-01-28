@@ -2,16 +2,22 @@
 layout: docs
 ---
 
-# Documentation Crafteur
+# Crafteur Documentation
 
-Bienvenue dans la documentation de **Crafteur** !
+Welcome to the **Crafteur** documentation!
 
-## Sections disponibles
+## Available Sections
 
-- [Introduction](./intro) - Découvrez Crafteur et ses fonctionnalités
-- Configuration (à venir)
-- Guide d'utilisation (à venir)
+### Getting Started
+- [Introduction](./docs/intro) - Discover Crafteur and its features
+- [Installation](./docs/install) - Install Crafteur on your server
+- [Architecture](./docs/architecture) - Learn about Crafteur's architecture
 
-## Démarrage rapide
+### Administrator Guide
+- [Managing Servers](./docs/manage-servers) - Manage your servers
+- [Add-ons](./docs/addons) - Install mods and plugins
+- [Scheduled Tasks](./docs/scheduler) - Schedule tasks
 
-Pour commencer avec Crafteur, consultez la page [Introduction](./docs/intro).
+## Quick Start
+
+To get started with Crafteur, check out the [Introduction](./docs/intro) page.

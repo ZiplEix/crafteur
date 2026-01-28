@@ -4,46 +4,46 @@ layout: docs
 
 <script>
   import Alert from '$lib/components/Alert.svelte';
-  let title = "Gestion des Serveurs";
+  let title = "Managing Servers";
 </script>
 
-# Gestion des Serveurs
+# Managing Servers
 
-Crafteur centralise toutes les opérations de maintenance de vos instances Minecraft. Cette page détaille les fonctionnalités du Dashboard.
+Crafteur centralizes all maintenance operations for your Minecraft instances. This page details the features of the Dashboard.
 
-## Cycle de Vie et Console
+## Lifecycle and Console
 
-Le header du serveur vous permet de contrôler son état :
-* **Démarrer :** Lance le processus Java avec les arguments de RAM définis.
-* **Redémarrer :** Envoie une commande `stop`, attend l'arrêt du processus, puis le relance.
-* **Arrêter :** Envoie la commande `stop` pour sauvegarder le monde proprement avant de couper le processus.
+The server header allows you to control its state:
+* **Start:** Launches the Java process with the defined RAM arguments.
+* **Restart:** Sends a `stop` command, waits for the process to stop, then relaunches it.
+* **Stop:** Sends the `stop` command to save the world properly before cutting the process.
 
 <Alert type="info" title="Kill vs Stop">
-  Si le serveur ne répond plus (freeze), Crafteur détectera l'arrêt du processus après un délai. Il n'y a pas encore de bouton "Force Kill" dans l'interface V1 pour éviter la corruption de données.
+  If the server is no longer responding (freeze), Crafteur will detect the process stoppage after a delay. There is no "Force Kill" button yet in the V1 interface to avoid data corruption.
 </Alert>
 
 ## Configuration (`server.properties`)
 
-L'onglet **Configuration** offre une interface graphique pour modifier le fichier `server.properties`.
-* **Gameplay :** Mode de jeu (Survival/Creative), Difficulté, PvP.
-* **Accès :** Whitelist, Nombre max de joueurs.
-* **Réseau :** Port du serveur (par défaut 25565).
+The **Configuration** tab offers a graphical interface to modify the `server.properties` file.
+* **Gameplay:** Game Mode (Survival/Creative), Difficulty, PvP.
+* **Access:** Whitelist, Max players.
+* **Network:** Server port (default 25565).
 
-Chaque modification nécessite un **redémarrage** pour être prise en compte.
+Each modification requires a **restart** to take effect.
 
-## Gestion des Versions
+## Version Management
 
-Vous pouvez changer la version de Minecraft (ex: passer de 1.20.1 à 1.20.4) ou le type de serveur (Vanilla ↔ Fabric).
+You can change the Minecraft version (e.g., from 1.20.1 to 1.20.4) or the server type (Vanilla ↔ Fabric).
 
-<Alert type="error" title="Attention au Downgrade">
-  Passer d'une version récente à une version plus ancienne (ex: 1.20 → 1.16) est impossible sans corrompre la carte. Minecraft ne sait pas "oublier" les nouveaux blocs. Faites toujours une sauvegarde avant de changer de version.
+<Alert type="error" title="Downgrade Warning">
+  Downgrading from a recent version to an older version (e.g., 1.20 → 1.16) is impossible without corrupting the map. Minecraft does not know how to "forget" new blocks. Always make a backup before changing versions.
 </Alert>
 
-## Gestionnaire de Mondes (World Switcher)
+## World Switcher
 
-L'onglet **Worlds** vous permet de gérer plusieurs dossiers de sauvegarde (maps) pour un même serveur.
-1. **Création :** Générez un nouveau dossier (ex: `lobby`, `build_creative`).
-2. **Activation :** Cliquez sur "Activer". Crafteur modifie la ligne `level-name` dans les propriétés.
-3. **Application :** Redémarrez le serveur. Il chargera le nouveau dossier.
+The **Worlds** tab allows you to manage multiple save folders (maps) for the same server.
+1. **Creation:** Generate a new folder (e.g., `lobby`, `build_creative`).
+2. **Activation:** Click "Activate". Crafteur modifies the `level-name` line in the properties.
+3. **Application:** Restart the server. It will load the new folder.
 
-Ceci est idéal pour alterner entre une map "Survie" et une map "Mini-jeu" sans perdre de données.
+This is ideal for switching between a "Survival" map and a "Minigame" map without losing data.

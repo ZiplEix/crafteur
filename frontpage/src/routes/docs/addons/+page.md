@@ -9,29 +9,29 @@ layout: docs
 
 # Extensions (Add-ons)
 
-Crafteur simplifie l'installation de contenu additionnel grâce à l'intégration de l'API **Modrinth**.
+Crafteur simplifies the installation of additional content thanks to the **Modrinth** API integration.
 
-## Comprendre les types de contenus
+## Understanding Content Types
 
-Il est crucial de choisir le bon **Type de Serveur** à la création pour supporter les bonnes extensions :
+It is crucial to choose the correct **Server Type** at creation to support the right extensions:
 
-| Type d'Extension | Type Serveur Requis | Dossier cible | Description |
+| Extension Type | Required Server Type | Target Folder | Description |
 | :--- | :--- | :--- | :--- |
-| **Mods** | Fabric (ou Forge) | `/mods` | Modifie le jeu en profondeur. Nécessite souvent d'être installé sur le serveur **ET** chez le joueur. |
-| **Plugins** | Paper (ou Spigot) | `/plugins` | Ajoute des fonctionnalités serveur (permissions, économie). Rien à installer pour le joueur. |
-| **Datapacks** | Tous (Vanilla inclus) | `world/datapacks` | Scripts et modifications légères intégrés à la sauvegarde du monde. |
+| **Mods** | Fabric (or Forge) | `/mods` | Modifies the game deeply. Often requires installation on the server **AND** the player's client. |
+| **Plugins** | Paper (or Spigot) | `/plugins` | Adds server features (permissions, economy). Nothing to install for the player. |
+| **Datapacks** | All (Vanilla included) | `world/datapacks` | Scripts and light modifications integrated into the world save. |
 
-## Le Navigateur Modrinth
+## The Modrinth Browser
 
-Dans l'onglet **Add-ons**, le sous-onglet "Catalogue" vous permet de rechercher des mods ou plugins.
-* **Filtrage Intelligent :** Crafteur filtre automatiquement les résultats pour ne montrer que ceux compatibles avec votre version (ex: 1.20.1) et votre loader (Fabric/Paper).
-* **Installation :** Un clic sur "Installer" télécharge la dernière version stable compatible.
+In the **Add-ons** tab, the "Catalog" sub-tab allows you to search for mods or plugins.
+* **Smart Filtering:** Crafteur automatically filters results to show only those compatible with your version (e.g., 1.20.1) and your loader (Fabric/Paper).
+* **Installation:** One click on "Install" downloads the latest stable compatible version.
 
-<Alert type="warning" title="Gestion des Dépendances">
-  Actuellement, Crafteur n'installe pas automatiquement les dépendances. Si vous installez un mod comme <em>Sodium</em>, vérifiez s'il nécessite <em>Fabric API</em> et installez-le manuellement via la recherche.
+<Alert type="warning" title="Dependency Management">
+  Currently, Crafteur does not automatically install dependencies. If you install a mod like <em>Sodium</em>, check if it requires <em>Fabric API</em> and install it manually via search.
 </Alert>
 
-## Upload Manuel
+## Manual Upload
 
-Si vous possédez un fichier `.jar` ou `.zip` spécifique (non présent sur Modrinth ou développement privé), vous pouvez le glisser-déposer dans la zone d'upload ou utiliser le bouton "Ajouter".
-* **Support Bulk :** Vous pouvez sélectionner plusieurs fichiers à la fois pour un upload groupé.
+If you have a specific `.jar` or `.zip` file (not present on Modrinth or private development), you can drag and drop it into the upload area or use the "Add" button.
+* **Bulk Support:** You can select multiple files at once for bulk upload.

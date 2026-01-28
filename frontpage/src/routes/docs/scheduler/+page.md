@@ -4,50 +4,50 @@ layout: docs
 
 <script>
   import Alert from '$lib/components/Alert.svelte';
-  let title = "Automatisation & Tâches";
+  let title = "Automation & Tasks";
 </script>
 
-# Tâches Planifiées (Scheduler)
+# Scheduled Tasks (Scheduler)
 
-Le système de planification vous permet d'automatiser la maintenance de votre serveur. Il est basé sur le format standard **Cron**, mais propose une interface visuelle simplifiée.
+The scheduling system allows you to automate your server maintenance. It is based on the standard **Cron** format but offers a simplified visual interface.
 
-## Types de Déclencheurs
+## Trigger Types
 
-### 1. Récurrent (Jours/Heures)
-Idéal pour des actions à heure fixe.
-* *Exemple :* "Tous les jours à 04:00 du matin".
-* *Interface :* Sélectionnez l'heure et cochez les jours de la semaine souhaités.
+### 1. Recurring (Days/Hours)
+Ideal for actions at a fixed time.
+* *Example:* "Every day at 04:00 AM".
+* *Interface:* Select the time and check the desired days of the week.
 
-### 2. Intervalle
-Idéal pour des actions répétitives fréquentes.
-* *Exemple :* "Toutes les 30 minutes".
-* *Usage :* Messages automatiques, sauvegardes fréquentes.
+### 2. Interval
+Ideal for frequent repetitive actions.
+* *Example:* "Every 30 minutes".
+* *Usage:* Automatic messages, frequent backups.
 
-### 3. Custom (Cron Avancé)
-Pour les utilisateurs experts nécessitant une précision spécifique.
-* *Format :* `Minute Heure Jour Mois JourSemaine`
-* *Exemple :* `0 12 1 * *` (À midi, le 1er jour de chaque mois).
+### 3. Custom (Advanced Cron)
+For expert users requiring specific precision.
+* *Format:* `Minute Hour Day Month DayOfWeek`
+* *Example:* `0 12 1 * *` (At noon, on the 1st day of every month).
 
-## Actions Disponibles
+## Available Actions
 
-Une tâche peut déclencher une des actions suivantes :
-* **Start / Stop / Restart :** Contrôle l'état du serveur.
-* **Command :** Exécute une ou plusieurs commandes Minecraft dans la console.
+A task can trigger one of the following actions:
+* **Start / Stop / Restart:** Controls the server state.
+* **Command:** Executes one or more Minecraft commands in the console.
 
-<Alert type="success" title="Astuce : Chaînage de Commandes">
-  <p>L'action "Command" supporte le multi-lignes. Vous pouvez créer une séquence complexe :</p>
+<Alert type="success" title="Tip: Command Chaining">
+  <p>The "Command" action supports multi-lines. You can create a complex sequence:</p>
   <pre class="text-xs bg-black p-2 rounded text-slate-300">
-say Attention, redémarrage dans 1 minute !
+say Attention, restart in 1 minute!
 save-all
 stop
   </pre>
-  <p>Couplez ceci avec une tâche "Start" programmée 2 minutes plus tard pour un cycle de maintenance complet.</p>
+  <p>Couple this with a "Start" task scheduled 2 minutes later for a full maintenance cycle.</p>
 </Alert>
 
-## Exemples Courants
+## Common Examples
 
-| Objectif | Type | Fréquence | Action |
+| Objective | Type | Frequency | Action |
 | :--- | :--- | :--- | :--- |
-| **Reboot Quotidien** | Récurrent | 06:00 (Tous les jours) | Restart |
-| **Message de Bienvenue** | Intervalle | 2 Heures | Command: `say Rejoignez notre Discord !` |
-| **Sauvegarde Monde** | Intervalle | 1 Heure | Command: `save-all` |
+| **Daily Reboot** | Recurring | 06:00 (Every day) | Restart |
+| **Welcome Message** | Interval | 2 Hours | Command: `say Join our Discord!` |
+| **World Backup** | Interval | 1 Hour | Command: `save-all` |

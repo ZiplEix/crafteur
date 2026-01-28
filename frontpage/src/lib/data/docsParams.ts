@@ -1,6 +1,6 @@
 export const docMenu = [
     {
-        title: "Démarrage",
+        title: "Getting Started",
         items: [
             { title: "Introduction", href: "/docs/intro" },
             { title: "Installation", href: "/docs/install" },
@@ -8,11 +8,11 @@ export const docMenu = [
         ]
     },
     {
-        title: "Guide Administrateur",
+        title: "Administrator Guide",
         items: [
-            { title: "Gestion des Serveurs", href: "/docs/manage-servers" },
+            { title: "Managing Servers", href: "/docs/manage-servers" },
             { title: "Mods & Plugins", href: "/docs/addons" },
-            { title: "Tâches Planifiées", href: "/docs/scheduler" }
+            { title: "Scheduled Tasks", href: "/docs/scheduler" }
         ]
     }
 ];

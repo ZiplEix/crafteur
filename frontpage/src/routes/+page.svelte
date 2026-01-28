@@ -33,70 +33,70 @@
         {
             title: "Multi-Version",
             description:
-                "Support complet pour Vanilla, Fabric (Mods) et Paper (Plugins). Déployez n'importe quelle version en quelques clics.",
+                "Full support for Vanilla, Fabric (Mods), and Paper (Plugins). Deploy any version in just a few clicks.",
             icon: Layers,
             color: "text-green-400",
         },
         {
-            title: "Monitoring Temps Réel",
+            title: "Real-Time Monitoring",
             description:
-                "Surveillez CPU, RAM et performances en direct. Graphiques détaillés et alertes automatiques.",
+                "Monitor CPU, RAM, and performance live. Detailed graphs and automatic alerts.",
             icon: Activity,
             color: "text-blue-400",
         },
         {
             title: "File Manager",
             description:
-                "Upload, téléchargement, compression ZIP/UNZIP et édition de fichiers directement depuis l'interface.",
+                "Upload, download, ZIP/UNZIP compression, and file editing directly from the interface.",
             icon: FolderTree,
             color: "text-purple-400",
         },
         {
-            title: "Modrinth Intégré",
+            title: "Integrated Modrinth",
             description:
-                "Installez vos mods et plugins favoris en 1 clic depuis le catalogue Modrinth.",
+                "Install your favorite mods and plugins in 1 click from the Modrinth catalog.",
             icon: Package,
             color: "text-emerald-400",
         },
         {
-            title: "Backup Automatique",
+            title: "Automatic Backup",
             description:
-                "Sauvegardes planifiées et compressées. Restauration en un clic pour protéger vos mondes.",
+                "Scheduled and compressed backups. One-click restoration to protect your worlds.",
             icon: Archive,
             color: "text-cyan-400",
         },
         {
             title: "Open Source",
             description:
-                "100% gratuit et auto-hébergeable. Code ouvert, communauté active, aucune limite.",
+                "100% free and self-hostable. Open code, active community, no limits.",
             icon: Code,
             color: "text-orange-400",
         },
         {
-            title: "Gestion des Mondes",
+            title: "World Management",
             description:
-                "Créez des mondes multiples, importez vos maps existantes (ZIP) et changez d'univers à la volée.",
+                "Create multiple worlds, import existing maps (ZIP), and switch universes on the fly.",
             icon: Globe,
             color: "text-indigo-400",
         },
         {
-            title: "Gestion Joueurs",
+            title: "Player Management",
             description:
-                "Gérez facilement la Whitelist, les Opérateurs (OP) et bannissez les indésirables.",
+                "Easily manage Whitelist, Operators (OP), and ban unwanted players.",
             icon: Users,
             color: "text-red-400",
         },
         {
-            title: "Performance Maximale",
+            title: "Maximum Performance",
             description:
-                "Propulsé par un backend Go ultra-léger pour une utilisation minimale des ressources.",
+                "Powered by an ultra-lightweight Go backend for minimal resource usage.",
             icon: Zap,
             color: "text-yellow-400",
         },
         {
-            title: "Automatisation",
+            title: "Automation",
             description:
-                "Planifiez des redémarrages automatiques, des commandes récurrentes et des annonces.",
+                "Schedule automatic restarts, recurrent commands, and announcements.",
             icon: Calendar,
             color: "text-purple-400",
         },
@@ -166,23 +166,23 @@
             <h1
                 class="text-4xl font-bold tracking-tight text-white sm:text-6xl"
             >
-                Gérez vos serveurs <span
+                Manage your servers <span
                     class="bg-clip-text text-transparent bg-linear-to-r from-green-400 to-blue-500"
-                    >simplement</span
+                    >simply</span
                 >
             </h1>
             <p class="mt-6 text-lg leading-8 text-slate-300">
-                L'outil open-source pour déployer, gérer et monitorer vos
-                instances Minecraft, Fabric et Paper en quelques secondes.
+                The open-source tool to deploy, manage, and monitor your
+                Minecraft, Fabric, and Paper instances in seconds.
             </p>
             <div class="mt-10 flex items-center justify-center gap-x-6">
                 <a
                     href="#install"
                     class="rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-green-900/20 hover:bg-green-500 hover:shadow-green-900/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all"
                 >
-                    Commencer l'installation
+                    Start Installation
                 </a>
-                <a
+                <!-- <a
                     href="#demo"
                     class="group text-sm font-semibold leading-6 text-white hover:text-green-400 transition-colors flex items-center gap-2"
                 >
@@ -191,7 +191,7 @@
                         class="group-hover:translate-x-1 transition-transform"
                         >→</span
                     >
-                </a>
+                </a> -->
             </div>
         </div>
 
@@ -266,11 +266,11 @@
             <h2
                 class="text-3xl font-bold tracking-tight text-white sm:text-4xl"
             >
-                Tout ce dont vous avez besoin
+                Everything you need
             </h2>
             <p class="mt-4 text-lg text-slate-400">
-                Une suite complète d'outils pour gérer vos serveurs Minecraft
-                comme un pro.
+                A complete suite of tools to manage your Minecraft servers like
+                a pro.
             </p>
         </div>
 
@@ -305,11 +305,11 @@
             <h2
                 class="text-3xl font-bold tracking-tight text-white sm:text-4xl"
             >
-                Prêt en 30 secondes
+                Ready in 30 seconds
             </h2>
             <p class="mt-4 text-lg text-slate-400">
-                Une seule commande pour tout installer sur votre VPS
-                Ubuntu/Debian.
+                A single command to install everything on your Ubuntu/Debian
+                VPS.
             </p>
         </div>
 
@@ -350,7 +350,7 @@
 
         {#if copied}
             <p class="mt-4 text-center text-sm text-green-400 animate-pulse">
-                ✓ Copié dans le presse-papier !
+                ✓ Copied to clipboard!
             </p>
         {/if}
     </div>

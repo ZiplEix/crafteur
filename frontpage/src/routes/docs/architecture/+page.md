@@ -6,57 +6,57 @@ layout: docs
   import Alert from '$lib/components/Alert.svelte';
 </script>
 
-# Architecture des Fichiers
+# File Architecture
 
-Comprendre l'organisation des fichiers de Crafteur est essentiel pour la maintenance et les sauvegardes.
+Understanding the organization of Crafteur files is essential for maintenance and backups.
 
-## Arborescence
+## Directory Structure
 
-Crafteur installe toutes ses données dans `/opt/crafteur`. Voici la structure détaillée :
+Crafteur installs all its data in `/opt/crafteur`. Here is the detailed structure:
 
 ```text
 /opt/crafteur/
-├── crafteur                 # Le binaire exécutable de l'application
-└── data/                    # Dossier de données persistantes
-    ├── crafteur.db          # Base de données SQLite (utilisateurs, configs)
-    ├── backups/             # Archives ZIP des sauvegardes serveurs
-    └── servers/             # Dossiers des instances Minecraft
-        └── <uuid>/          # Un dossier par serveur (nommé par UUID)
-            ├── server.jar   # Jar du serveur (paper.jar, fabric.jar...)
+├── crafteur                 # The application executable binary
+└── data/                    # Persistent data directory
+    ├── crafteur.db          # SQLite database (users, configs)
+    ├── backups/             # Server backup ZIP archives
+    └── servers/             # Minecraft instance directories
+        └── <uuid>/          # One folder per server (named by UUID)
+            ├── server.jar   # Server Jar (paper.jar, fabric.jar...)
             ├── server.properties
             ├── eula.txt
-            ├── world/       # Données du monde
-            ├── mods/        # Dossier mods (si Fabric)
-            └── plugins/     # Dossier plugins (si Paper)
+            ├── world/       # World data
+            ├── mods/        # Mods folder (if Fabric)
+            └── plugins/     # Plugins folder (if Paper)
 ```
 
-## Base de Données
+## Database
 
-Crafteur utilise **SQLite** pour stocker les métadonnées (comptes utilisateurs, configurations des serveurs, historique des tâches). Le fichier `crafteur.db` est le cœur de votre installation.
+Crafteur uses **SQLite** to store metadata (user accounts, server configurations, task history). The `crafteur.db` file is the heart of your installation.
 
-<Alert type="warning" title="Attention">
-  Ne modifiez jamais le fichier <code>crafteur.db</code> ou le dossier <code>servers/</code> manuellement pendant que Crafteur est en cours d'exécution. Vous risquez de corrompre les données ou de provoquer des incohérences.
+<Alert type="warning" title="Warning">
+  Never modify the <code>crafteur.db</code> file or the <code>servers/</code> folder manually while Crafteur is running. You risk corrupting data or causing inconsistencies.
 </Alert>
 
-## Sauvegardes Manuelles
+## Manual Backups
 
-Bien que Crafteur dispose d'un systéme de backup automatique pour les serveurs Minecraft, il est recommandé de sauvegarder l'installation Crafteur elle-même régulièrement.
+Although Crafteur has an automatic backup system for Minecraft servers, it is recommended to back up the Crafteur installation itself regularly.
 
-Pour faire un backup complet (Base de données + Serveurs) :
+To make a full backup (Database + Servers):
 
-1. **Arrêtez le service** pour déverrouiller la base de données :
+1. **Stop the service** to unlock the database:
    ```bash
    sudo systemctl stop crafteur
    ```
-2. **Copiez les données** :
+2. **Copy the data**:
    ```bash
    sudo cp -r /opt/crafteur/data /path/to/backup/location
    ```
-3. **Redémarrez le service** :
+3. **Restart the service**:
    ```bash
    sudo systemctl start crafteur
    ```
 
 <Alert type="error" title="Important">
-  Assurez-vous toujours que le service est arrêté avant de copier `crafteur.db` pour éviter les fichiers corrompus.
+  Always make sure the service is stopped before copying `crafteur.db` to avoid corrupted files.
 </Alert>

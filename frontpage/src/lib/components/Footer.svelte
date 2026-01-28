@@ -11,23 +11,23 @@
                     Crafteur
                 </a>
                 <p class="mt-4 text-sm text-slate-400">
-                    L'outil open-source pour gérer vos serveurs Minecraft.
+                    The open-source tool to manage your Minecraft servers.
                 </p>
                 <p class="mt-4 text-xs text-slate-500">
-                    © 2026 Crafteur. Tous droits réservés.
+                    © 2026 Crafteur. All rights reserved.
                 </p>
             </div>
 
             <!-- Produit -->
             <div>
-                <h3 class="text-sm font-semibold text-white mb-4">Produit</h3>
+                <h3 class="text-sm font-semibold text-white mb-4">Product</h3>
                 <ul class="space-y-3">
                     <li>
                         <a
                             href="#features"
                             class="text-sm text-slate-400 hover:text-white transition-colors"
                         >
-                            Fonctionnalités
+                            Features
                         </a>
                     </li>
                     <li>
@@ -43,9 +43,7 @@
 
             <!-- Ressources -->
             <div>
-                <h3 class="text-sm font-semibold text-white mb-4">
-                    Ressources
-                </h3>
+                <h3 class="text-sm font-semibold text-white mb-4">Resources</h3>
                 <ul class="space-y-3">
                     <li>
                         <a
@@ -79,7 +77,7 @@
 
             <!-- Légal -->
             <div>
-                <h3 class="text-sm font-semibold text-white mb-4">Légal</h3>
+                <h3 class="text-sm font-semibold text-white mb-4">Legal</h3>
                 <ul class="space-y-3">
                     <li>
                         <a
@@ -88,7 +86,7 @@
                             rel="noreferrer"
                             class="text-sm text-slate-400 hover:text-white transition-colors"
                         >
-                            Licence MIT
+                            MIT License
                         </a>
                     </li>
                 </ul>

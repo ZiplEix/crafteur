@@ -2,33 +2,31 @@
 layout: docs
 ---
 
-# Introduction à Crafteur
+# Introduction to Crafteur
 
-Bienvenue dans la documentation de **Crafteur**, l'outil open-source pour gérer vos serveurs Minecraft.
+Welcome to the documentation for **Crafteur**, the open-source tool for managing your Minecraft servers.
 
-## Qu'est-ce que Crafteur ?
+## What is Crafteur?
 
-Crafteur est une plateforme complète qui vous permet de :
+Crafteur is a complete platform that allows you to:
 
-- **Déployer** rapidement des serveurs Minecraft (Vanilla, Fabric, Paper)
-- **Gérer** vos instances avec une interface web moderne
-- **Monitorer** les performances en temps réel (CPU, RAM)
-- **Sauvegarder** automatiquement vos mondes
+- **Deploy** Minecraft servers quickly (Vanilla, Fabric, Paper)
+- **Manage** your instances with a modern web interface
+- **Monitor** performance in real-time (CPU, RAM)
+- **Backup** your worlds automatically
 
-## Installation Rapide
+## Quick Installation
 
-Pour installer Crafteur sur votre serveur Ubuntu/Debian :
+To install Crafteur on your Ubuntu/Debian server:
 
 ```bash
 curl -sL get.crafteur.fr | sudo bash
 ```
 
-## Prochaines Étapes
+## Next Steps
 
-1. [Configuration initiale](/docs/configuration)
-2. [Créer votre premier serveur](/docs/create-server)
-3. [Gérer les mods et plugins](/docs/mods-plugins)
+[Install Crafteur](/docs/install)
 
 ---
 
-Cette documentation est en cours de construction. Plus de contenu arrive bientôt !
+This documentation is under construction. More content is coming soon!

@@ -6,60 +6,60 @@ layout: docs
   import Alert from '$lib/components/Alert.svelte';
 </script>
 
-# Référence API
+# API Reference
 
-Crafteur expose une API RESTful qui vous permet d'automatiser la gestion de vos serveurs ou d'intégrer Crafteur à d'autres outils.
+Crafteur exposes a RESTful API that allows you to automate the management of your servers or integrate Crafteur with other tools.
 
-## Authentification
+## Authentication
 
-Toutes les requêtes vers l'API doivent être authentifiées via un Jeton (Token). 
+All requests to the API must be authenticated via a Token.
 
-1. Connectez-vous à l'interface web.
-2. Ouvrez les outils de développement (F12) ou inspectez les requêtes pour récupérer votre token `Authorization`.
-3. Utilisez ce token dans le header de vos requêtes :
+1. Log in to the web interface.
+2. Open developer tools (F12) or inspect requests to retrieve your `Authorization` token.
+3. Use this token in the header of your requests:
 
 ```http
-Authorization: Bearer <votre_token_jwt>
+Authorization: Bearer <your_jwt_token>
 ```
 
 <Alert type="info" title="Note">
-  Une fonctionnalité pour générer des clés API persistantes (API Keys) est prévue pour les prochaines versions.
+  A feature to generate persistent API Keys is planned for future versions.
 </Alert>
 
-## Exemples d'Utilisation
+## Usage Examples
 
-Voici quelques exemples courants d'interaction avec l'API.
+Here are some common examples of interacting with the API.
 
-### Démarrer un serveur
+### Start a server
 
-Permet de lancer une instance Minecraft spécifique.
+Allows launching a specific Minecraft instance.
 
-- **Méthode** : `POST`
-- **Endpoint** : `/api/servers/{id}/start`
+- **Method**: `POST`
+- **Endpoint**: `/api/servers/{id}/start`
 
-**Exemple cURL :**
+**cURL Example:**
 
 ```bash
-curl -X POST https://panel.votredomaine.com/api/servers/123e4567-e89b-12d3-a456-426614174000/start \
+curl -X POST https://panel.yourdomain.com/api/servers/123e4567-e89b-12d3-a456-426614174000/start \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json"
 ```
 
-### Arrêter un serveur
+### Stop a server
 
-Arrête proprement une instance.
+Properly stops an instance.
 
-- **Méthode** : `POST`
-- **Endpoint** : `/api/servers/{id}/stop`
+- **Method**: `POST`
+- **Endpoint**: `/api/servers/{id}/stop`
 
-### Récupérer les statuts
+### Get statuses
 
-Obtenir la liste des serveurs et leur statut (online/offline).
+Get the list of servers and their status (online/offline).
 
-- **Méthode** : `GET`
-- **Endpoint** : `/api/servers`
+- **Method**: `GET`
+- **Endpoint**: `/api/servers`
 
-Reponse (JSON) :
+Response (JSON):
 ```json
 [
   {
