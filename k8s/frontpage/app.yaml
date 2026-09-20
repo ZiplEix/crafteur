@@ -70,4 +70,4 @@ spec:
   tls:
   - hosts:
     - crafteur.fr
-    secretName: crafteur-baptiste-zip-tls
+    secretName: crafteur-fr-tls
